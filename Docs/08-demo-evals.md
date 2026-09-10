@@ -1,6 +1,6 @@
 # Demo, evals y tracks
 
-El jurado ve el vídeo primero (máx. 5 min). Si hace falta explicar hexagonal, el demo falló.
+El jurado ve el vídeo primero (máx. 5 min). El vídeo es la **cuña** (un viaje). La tesis es la cola de excepciones documentales, no «solo viáticos». Si hace falta explicar hexagonal, el demo falló.
 
 ## Historia de 10 segundos
 
@@ -9,6 +9,7 @@ El jurado ve el vídeo primero (máx. 5 min). Si hace falta explicar hexagonal, 
 3. El sistema marca **⚠ REVISIÓN** con la regla en claro.
 4. El resto de tickets nítidos y dentro de política pasan a ✓ PROCEDE.
 5. Liquidación: respaldado vs adelanto vs excepciones abiertas.
+6. Opcional en el mismo vídeo: motivo «compré unas cosas» → REVISIÓN; o abrir el rastro de auditoría de un ⚠.
 
 Eso es el equivalente local de *texto peligroso → bloquea* / *PARK o REFUSE*.
 
@@ -28,11 +29,13 @@ Golden set en `apps/mobile/resources/samples/receipts/` (y fixtures de viaje en 
 - Al menos un **duplicado**.
 - Al menos uno **denso / térmico** (perfil Base).
 - Al menos uno **ilegible** → REVISIÓN, no invento.
+- Al menos un **motivo ambiguo** → `classify-motive` no inventa categoría con confianza alta.
 
 Métricas de producto (dominio, sin GPU):
 
 - ¿El veredicto coincide con el golden? (`PROCEDE` / `REVISIÓN` / `NO PROCEDE`)
 - ¿El validador de dígitos rechazó un postproceso que cambió el monto?
+- Métrica de cuello de botella (§13): fracción automática vs excepción (el 85/15 del brief es ejemplo, no SLA).
 
 Métricas QVAC (log de rendimiento del track Psy): carga, prompt, tokens, TTFT, throughput. Nombres de modelo y quant honestos (VisionPsy-Nano Flash vs Base; `QWEN3_4B_INST_Q4_K_M`, no la constante de difusión).
 

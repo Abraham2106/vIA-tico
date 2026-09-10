@@ -20,12 +20,12 @@ La app de producto en el teléfono es **Expo + React Native + QVAC**. **No Flutt
 
 ## Qué vive aquí
 
-- Expo Router: `apps/mobile/app/{capture,preview,pairing}`.
+- Expo Router: `apps/mobile/app/{capture,motive,preview,pairing}`.
 - Adaptadores: `qvac-visionpsy`, `camera`, `filesystem`.
 - Composition: `src/composition/expo`.
 - Worker: `apps/mobile/qvac/` + `config/qvac`.
 
-Captura → archivo en disco → VisionPsy (Base si el ticket es denso) → DTO schema → transporte. **No** PDF, **no** Qwen, **no** liquidación.
+Captura → archivo en disco → VisionPsy (Base si el ticket es denso) → DTO schema. Motivo libre en `app/motive`. **No** PDF, **no** Qwen, **no** liquidación.
 
 ## Permisos / cámara
 
