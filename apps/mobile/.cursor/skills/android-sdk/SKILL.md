@@ -25,7 +25,7 @@ La app de producto en el teléfono es **Expo + React Native + QVAC**. **No Flutt
 - Composition: `src/composition/expo`.
 - Worker: `apps/mobile/qvac/` + `config/qvac`.
 
-Captura → archivo en disco → VisionPsy → DTO → transporte. **No** PDF, **no** LLM pesado, **no** liquidación completa.
+Captura → archivo en disco → VisionPsy (Base si el ticket es denso) → DTO schema → transporte. **No** PDF, **no** Qwen, **no** liquidación.
 
 ## Permisos / cámara
 

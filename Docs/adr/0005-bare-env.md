@@ -16,5 +16,5 @@ El worker QVAC corre en Bare. Electron lo spawnea; Expo lo embebe vía BareKit; 
 
 ## Consecuencias
 
-- El worker del teléfono no arrastra el LLM de escritorio.
+- El worker del teléfono no arrastra Qwen Instruct.
 - Electron: `asar: false`. Móvil: prebuild nativo, device físico.

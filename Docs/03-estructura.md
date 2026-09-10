@@ -7,31 +7,34 @@ vIA-tico/
 ├── Docs/
 ├── packages/
 │   ├── core/                              # HEXÁGONO — prohibido Expo/Electron/QVAC
-│   │   ├── domain/{traveler,trip,receipt,policy,settlement,shared}/
+│   │   ├── domain/{traveler,trip,receipt,policy,exception,settlement,shared}/
 │   │   └── application/
 │   │       ├── ports/{inbound,outbound}/
 │   │       └── use-cases/
 │   │           ├── register-trip/
 │   │           ├── attach-receipt/
-│   │           ├── analyze-receipt/       # visión (se ejecuta en móvil)
+│   │           ├── analyze-receipt/       # visión (móvil)
 │   │           ├── ingest-vision-result/  # desktop recibe el DTO
-│   │           ├── analyze-with-llm/      # LLM pesado (desktop)
-│   │           ├── validate-policy/
+│   │           ├── analyze-with-llm/      # postproceso lingüístico (desktop)
+│   │           ├── validate-extraction/   # dígitos / schema — código
+│   │           ├── validate-policy/       # viaje, topes — código
+│   │           ├── detect-duplicates/
+│   │           ├── open-exception/
 │   │           ├── settle-trip/
 │   │           ├── export-report/
 │   │           └── pair-devices/
 │   └── contracts/                         # handshake; ambas apps pueden importar
-│       ├── vision-result/
+│       ├── vision-result/                 # schema + confianza + RAW
 │       ├── analysis-job/
 │       ├── pairing/
 │       └── export-formats/
 ├── apps/
-│   ├── desktop/                           # APP Electron (UI + LLM + export)
+│   ├── desktop/                           # registro + excepciones
 │   │   ├── src/
-│   │   │   ├── main/                      # electron-vite (relativo a esta app)
+│   │   │   ├── main/
 │   │   │   ├── preload/
 │   │   │   ├── renderer/src/
-│   │   │   │   ├── features/{inbox,receipts,trips,settlements,export}/
+│   │   │   │   ├── features/{inbox,exceptions,receipts,trips,settlements,export}/
 │   │   │   │   └── {assets,components,hooks,pages,styles}/
 │   │   │   ├── adapters/
 │   │   │   │   ├── driven/
@@ -42,11 +45,11 @@ vIA-tico/
 │   │   │   │   └── driving/{ipc,renderer-bridge}/
 │   │   │   └── composition/{electron,bare}/
 │   │   ├── config/qvac/
-│   │   ├── qvac/                          # worker.bundle.js de ESTA app
+│   │   ├── qvac/
 │   │   ├── resources/{icons,models}/
 │   │   └── tests/{e2e,integration/qvac}/
-│   └── mobile/                            # APP Expo Android
-│       ├── app/{capture,preview,pairing}/ # Expo Router
+│   └── mobile/                            # captura + VisionPsy
+│       ├── app/{capture,preview,pairing}/
 │       ├── src/
 │       │   ├── adapters/
 │       │   │   ├── driven/{qvac-visionpsy,camera,filesystem}/
@@ -54,32 +57,34 @@ vIA-tico/
 │       │   └── composition/expo/
 │       ├── config/qvac/
 │       ├── qvac/
-│       ├── resources/samples/receipts/
+│       ├── resources/samples/receipts/    # golden set (ADR 0012)
 │       └── tests/{e2e,integration/qvac}/
-└── tests/unit/{domain,application}/       # hexágono, sin GPU
+└── tests/unit/{domain,application}/       # veredictos, sin GPU
 ```
+
+La raíz **`src/`** del scaffold de una sola app (PR #1) no se revive.
 
 ## Por qué monorepo (y no un solo paquete)
 
-Expo y electron-vite pelean: Metro vs Vite, React Native vs `react-dom`, `expo-plugin` vs `QvacForgePlugin`, `minSdk` vs `asar: false`. Un `package.json` único obliga a esa pelea. Dos repos romperían el pin 0.18.2 y los DTOs.
+Expo y electron-vite pelean: Metro vs Vite, React Native vs `react-dom`, `expo-plugin` vs `QvacForgePlugin`. Dos repos romperían el pin 0.18.2 y los DTOs.
 
-Workspaces (npm o pnpm) se declaran cuando existan los manifiestos. Este scaffold solo reserva las carpetas.
+Workspaces se declaran cuando existan los manifiestos.
 
 ## Por qué `apps/desktop/src/main|preload|renderer`
 
-El tutorial QVAC y `QvacForgePlugin` asumen esa forma **dentro del paquete Electron**. Mover el shell a `apps/desktop` no rompe el tutorial: el `cwd` de Forge/Vite es esa app. `dist/main|preload|renderer` sigue evitando el choque con `out/` de Forge.
+El tutorial QVAC y `QvacForgePlugin` asumen esa forma **dentro del paquete Electron**. `cwd` de Forge/Vite = esa app. `dist/main|preload|renderer` evita el choque con `out/` de Forge.
 
 ## Por qué `app/` en móvil
 
-Expo Router monta rutas desde `app/` en la raíz del paquete. `src/adapters` queda al lado, no dentro del router.
+Expo Router monta rutas desde `app/` en la raíz del paquete.
 
 ## Bundles QVAC separados
 
-Cada app tiene `qvac/` y `config/qvac/`. El worker del teléfono no debe arrastrar el GGUF del LLM de escritorio, ni al revés.
+Cada app tiene `qvac/` y `config/qvac/`. El worker del teléfono no arrastra el GGUF de Qwen.
 
 ## Compositions
 
-**Desktop `composition/electron`:** LLM pesado, persistencia, exporters, `startQVACProvider`, `--no-sandbox` en Linux.
+**Desktop `composition/electron`:** Qwen Instruct, persistencia, exporters, provider opcional, `--no-sandbox` en Linux.
 
 **Desktop `composition/bare`:** `bare-process` + `plugins([llmPlugin])` si el proceso *es* Bare.
 
