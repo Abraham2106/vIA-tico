@@ -1,0 +1,34 @@
+# Cómo trabajar el monorepo
+
+ViáticoCero es **un repo, dos apps, un hexágono**. Las reglas cortas para humanos y agentes están también en skills de Cursor (se cargan solas o con `/nombre`).
+
+## Día a día
+
+1. Clona **un** Git. No hay segundo remoto para el celular.
+2. Elige superficie:
+   - Dominio / puertos → `packages/core`
+   - JSON entre teléfono y PC → `packages/contracts`
+   - Pantalla o VisionPsy → `apps/mobile`
+   - Inbox, LLM, PDF/Excel → `apps/desktop`
+3. Un PR puede tocar varios paquetes si el DTO o un caso de uso cruza dispositivos.
+4. Todavía no hay `package.json`: este árbol es scaffold. El primer PR de código declara workspaces (npm o pnpm) **sin** fusionar Expo y Electron en un solo manifiesto.
+
+## Skills en este repo
+
+Cursor las descubre en `.cursor/skills/` y en `apps/*/.cursor/skills/` (estas últimas solo al trabajar esa app).
+
+| Skill | Dónde | Para qué |
+| --- | --- | --- |
+| `viaticocero-monorepo` | raíz | Dónde poner cada cambio |
+| `qvac-sdk` | raíz | `@qvac/sdk@0.18.2`, plugins, Bare |
+| `local-ai` | raíz | Nada de APIs cloud de recibos |
+| `delegated-inference` | raíz | DTO vs `loadModel({ delegate })` |
+| `electron-qvac` | `apps/desktop` | App Electron de producto |
+| `android-sdk` | `apps/mobile` | Expo, device físico, minSdk |
+| `metro-expo` | `apps/mobile` | Metro ≠ Vite |
+
+En el chat del Agent: `/viaticocero-monorepo`, `/qvac-sdk`, etc.
+
+## Relación con Docs/
+
+`Docs/` justifica **por qué**. Las skills dicen **cómo debe comportarse el agente** al implementar. Si chocan, gana el ADR y se enmenda la skill en el mismo PR.

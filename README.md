@@ -20,6 +20,10 @@ Este repositorio, ahora mismo, es **solo scaffold**: carpetas hexagonales (`.git
 - Escritorio: electron-vite (React) + LLM pesado (local) + Bare worker
 - Transporte: DTO hacia el inbox del desktop (P2P QVAC opcional para el LLM)
 
+## Cómo se trabaja
+
+Un clone. Cambias el paquete que toca (core, contracts, móvil o desktop). Las reglas para el Agent están en skills de Cursor: `.cursor/skills/` y `apps/*/.cursor/skills/`. Guía humana: [`Docs/06-como-trabajar-monorepo.md`](./Docs/06-como-trabajar-monorepo.md).
+
 ## Mapa rápido
 
 ```
@@ -28,4 +32,6 @@ packages/contracts    DTO visión → job de análisis → formatos de export
 apps/desktop          UI + LLM + export + provider
 apps/mobile           captura + VisionPsy
 Docs/                 decisiones
+.cursor/skills        QVAC, IA local, monorepo, inferencia delegada
+apps/*/.cursor/skills Electron / Android / Metro
 ```
