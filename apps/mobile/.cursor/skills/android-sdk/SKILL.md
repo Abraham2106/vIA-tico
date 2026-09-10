@@ -2,13 +2,13 @@
 name: android-sdk
 description: >
   Android para ViáticoCero: Expo 54, device físico, minSdk 29, adb, VisionPsy
-  on-device, no Kotlin como app. Úsala al editar apps/mobile, permisos,
-  cámara, prebuild, Gradle, emulador o “stack Android”.
+  on-device, no Flutter, no Kotlin como app. Úsala al editar apps/mobile,
+  permisos, cámara, prebuild, Gradle, emulador, Flutter o “stack Android”.
 ---
 
 # Android / Expo (apps/mobile)
 
-La app de producto en el teléfono es **Expo + React Native + QVAC**, no una app Kotlin/Jetpack. Android Studio / `adb` / SDK son **toolchain**.
+La app de producto en el teléfono es **Expo + React Native + QVAC**. **No Flutter.** No Kotlin/Jetpack como app. Android Studio / `adb` / SDK son **toolchain**.
 
 ## Requisitos QVAC
 
@@ -34,6 +34,7 @@ Captura → archivo en disco → VisionPsy → DTO → transporte. **No** PDF, *
 
 ## Qué no hagas
 
+- **Flutter** (`pubspec.yaml`, `Widget`, un segundo `apps/mobile` en Dart). ADR 0009. QVAC no tiene SDK Flutter.
 - Nueva Activity Java “porque es Android”.
 - Probar QVAC en AVD.
 - Meter `electron` o `react-dom` en este paquete.

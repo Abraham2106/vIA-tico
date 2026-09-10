@@ -25,7 +25,7 @@ Un Git, **cuatro paquetes**. Dos artefactos de usuario (APK + app Electron). El 
 ## Reglas
 
 1. **No revivas `src/` en la raíz.** Eso era el scaffold de una sola app (PR #1). Murió en el PR #2.
-2. **No mezcles toolchains.** Metro/Expo solo en `apps/mobile`. electron-vite/Forge solo en `apps/desktop`. `packages/core` no importa `expo`, `react-native`, `electron`, `react`, `@qvac/sdk`.
+2. **No mezcles toolchains.** Metro/Expo solo en `apps/mobile`. electron-vite/Forge solo en `apps/desktop`. **No Flutter.** `packages/core` no importa `expo`, `react-native`, `electron`, `react`, `@qvac/sdk`.
 3. **No compartas componentes UI** entre RN y React DOM. Sí tipos (`contracts`) y dominio (`core`).
 4. **Cambio de DTO = un PR que toca contracts + las dos apps** si hace falta. No “lo arreglo luego en el otro repo”.
 5. **Workspaces aún no existen** (no hay `package.json`). Cuando se añadan: npm o pnpm workspaces en la raíz, un manifiesto por app/paquete. No inventes un mega-`package.json` único.

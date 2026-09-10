@@ -8,7 +8,7 @@ Este repositorio, ahora mismo, es **solo scaffold**: carpetas hexagonales (`.git
 
 | App | Dónde | Qué hace |
 | --- | --- | --- |
-| `apps/mobile` | Android (Expo) | Cámara + **VisionPsy Nano** + envío del DTO |
+| `apps/mobile` | Android (**Expo / React Native**, no Flutter) | Cámara + **VisionPsy Nano** + envío del DTO |
 | `apps/desktop` | Electron | **App de producto**: LLM pesado, inbox, guardar, PDF/CSV/XLSX/JSON, provider P2P |
 
 `packages/core` no conoce Expo, Electron ni `@qvac/sdk`. `packages/contracts` es el handshake teléfono ↔ escritorio.
@@ -16,7 +16,7 @@ Este repositorio, ahora mismo, es **solo scaffold**: carpetas hexagonales (`.git
 ## Stack (fijo)
 
 - TypeScript, `@qvac/sdk@0.18.2`
-- Móvil: Expo ≥ 54 + VisionPsy Nano (local)
+- Móvil: Expo ≥ 54 + React Native + VisionPsy Nano (local). **No Flutter** (ADR 0009).
 - Escritorio: electron-vite (React) + LLM pesado (local) + Bare worker
 - Transporte: DTO hacia el inbox del desktop (P2P QVAC opcional para el LLM)
 
