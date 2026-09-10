@@ -65,6 +65,9 @@ describe('pipeline de expediente (sin QVAC)', () => {
       async refine(extraction: VisionResult) {
         return { ...extraction, monto: 1500 }
       },
+      async classifyMotive() {
+        return { categoria: 'alimentacion', razon: 'mock', confianza_clasificacion: 'alta' }
+      },
     }
     deps.languageModel = tamper
     deps.clock = new FixedClock('2026-09-12T15:00:00.000Z')
@@ -111,6 +114,72 @@ describe('pipeline de expediente (sin QVAC)', () => {
     })
     expect(receipt.linguisticPostprocess).toBeUndefined()
     expect(receipt.verdict).toBe('PROCEDE')
+  })
+
+  it('aplica categoria de classify-motive solo con confianza alta y sin categoria previa', async () => {
+    const deps = createMemoryDeps()
+    deps.languageModel = {
+      status: () => 'ready',
+      refine: async (extraction) => extraction,
+      classifyMotive: async () => ({
+        categoria: 'representacion',
+        razon: 'Almuerzo con cliente',
+        confianza_clasificacion: 'alta',
+      }),
+    }
+    deps.clock = new FixedClock('2026-09-12T15:00:00.000Z')
+    const workspace = createWorkspace(deps)
+    await workspace.deps.travelers.save({ id: DEMO_TRIP.travelerId, name: 'María Soto' })
+    await workspace.deps.trips.save(DEMO_TRIP)
+    const receipt = await workspace.attachReceipt({
+      tripId: DEMO_TRIP.id,
+      extraction: {
+        proveedor: 'Restaurante',
+        fecha: '2026-09-12',
+        monto: 12_000,
+        moneda: 'CRC',
+        tipo_documento: 'factura',
+        confianza_lectura: 'alta',
+        raw_text: 'ALMUERZO 12000',
+        motivo: 'Almorcé con el cliente regional',
+      },
+    })
+    expect(receipt.usedExtraction.categoria).toBe('representacion')
+    expect(receipt.motiveClassification?.confianza_clasificacion).toBe('alta')
+    expect(receipt.verdict).toBe('PROCEDE')
+  })
+
+  it('confianza de clasificación media fuerza REVISIÓN y no inventa categoria', async () => {
+    const deps = createMemoryDeps()
+    deps.languageModel = {
+      status: () => 'ready',
+      refine: async (extraction) => extraction,
+      classifyMotive: async () => ({
+        categoria: 'otro',
+        razon: 'Motivo vago',
+        confianza_clasificacion: 'media',
+      }),
+    }
+    deps.clock = new FixedClock('2026-09-12T15:00:00.000Z')
+    const workspace = createWorkspace(deps)
+    await workspace.deps.travelers.save({ id: DEMO_TRIP.travelerId, name: 'María Soto' })
+    await workspace.deps.trips.save(DEMO_TRIP)
+    const receipt = await workspace.attachReceipt({
+      tripId: DEMO_TRIP.id,
+      extraction: {
+        proveedor: 'Tienda',
+        fecha: '2026-09-12',
+        monto: 3000,
+        moneda: 'CRC',
+        tipo_documento: 'recibo',
+        confianza_lectura: 'alta',
+        raw_text: 'TIENDA 3000',
+        motivo: 'Compré unas cosas para el viaje',
+      },
+    })
+    expect(receipt.usedExtraction.categoria).toBeUndefined()
+    expect(receipt.triggeredRules.map((rule) => rule.code)).toContain('CONFIANZA_CLASIFICACION')
+    expect(receipt.verdict).toBe('REVISION')
   })
 
   it('resolver excepción aprueba y entra a liquidación', async () => {

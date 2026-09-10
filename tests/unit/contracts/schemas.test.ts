@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   parseAnalysisJob,
+  parseMotiveClassification,
   parsePairingPayload,
   parseVisionResult,
+  safeParseMotiveClassification,
   safeParseVisionResult,
 } from '@viaticocero/contracts'
 
@@ -65,5 +67,23 @@ describe('analysis-job y pairing', () => {
       createdAt: '2026-09-10T00:00:00.000Z',
     })
     expect(pairing.qvacProviderPublicKey).toBeUndefined()
+  })
+})
+
+describe('motive-classification', () => {
+  it('acepta categoria + razon + confianza y rechaza veredicto', () => {
+    const value = parseMotiveClassification({
+      categoria: 'representacion',
+      razon: 'Reunión con cliente',
+      confianza_clasificacion: 'alta',
+    })
+    expect(value.categoria).toBe('representacion')
+    const rejected = safeParseMotiveClassification({
+      categoria: 'representacion',
+      razon: 'Reunión con cliente',
+      confianza_clasificacion: 'alta',
+      veredicto: 'PROCEDE',
+    })
+    expect(rejected.success).toBe(false)
   })
 })
