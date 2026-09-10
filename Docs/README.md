@@ -10,7 +10,7 @@ Este directorio justifica el scaffold. **No hay código de aplicación todavía*
 | [04-qvac-visionpsy-bare.md](./04-qvac-visionpsy-bare.md) | Modelos, Bare, P2P, configs por app |
 | [05-referencias.md](./05-referencias.md) | Tutorial Electron, Expo, delegated inference, JarvisQ/Beacon |
 | [06-como-trabajar-monorepo.md](./06-como-trabajar-monorepo.md) | Día a día + skills de Cursor en el repo |
-| [adr/](./adr/) | Decisiones numeradas (0001–0008) |
+| [adr/](./adr/) | Decisiones numeradas (0001–0009) |
 
 ## Producto
 

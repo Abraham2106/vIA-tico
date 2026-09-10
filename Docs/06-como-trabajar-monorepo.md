@@ -8,7 +8,7 @@ ViáticoCero es **un repo, dos apps, un hexágono**. Las reglas cortas para huma
 2. Elige superficie:
    - Dominio / puertos → `packages/core`
    - JSON entre teléfono y PC → `packages/contracts`
-   - Pantalla o VisionPsy → `apps/mobile`
+   - Pantalla o VisionPsy → `apps/mobile` (Expo/RN, **no Flutter**)
    - Inbox, LLM, PDF/Excel → `apps/desktop`
 3. Un PR puede tocar varios paquetes si el DTO o un caso de uso cruza dispositivos.
 4. Todavía no hay `package.json`: este árbol es scaffold. El primer PR de código declara workspaces (npm o pnpm) **sin** fusionar Expo y Electron en un solo manifiesto.

@@ -12,7 +12,7 @@ El móvil se empaqueta con **Metro** (Expo). Vite es solo `apps/desktop`.
 
 ## Reglas
 
-1. No añadas `electron-vite`, `@vitejs/plugin-react` ni `react-dom` a `apps/mobile`.
+1. No añadas `electron-vite`, `@vitejs/plugin-react` ni `react-dom` a `apps/mobile`. Tampoco Flutter (`flutter`, `dart`).
 2. No reutilices componentes del renderer Electron (div/className vs View).
 3. Alias de `packages/core` y `packages/contracts` vía workspaces/babel, no copiando carpetas.
 4. QVAC en Expo necesita `bare-pack` (devDependency del tutorial) y el plugin nativo; el bundle JS de Metro **no** sustituye el worker Bare.

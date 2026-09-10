@@ -13,7 +13,7 @@ Versiones y runtime **fijados**. Un hexágono, dos toolchains; no se mezcla un s
 | LLM (solo escritorio) | Modelo pesado vía QVAC llama.cpp | No corre en el teléfono |
 | Worker | **Bare** | Bundle por app (`apps/*/qvac/`); `asar: false` en Electron |
 | App escritorio | Electron + React + Vite | `electron-vite` template `react-ts` **dentro de** `apps/desktop` |
-| App móvil | Expo + React Native | Expo **≥ 54**, `react-native-bare-kit`, `@qvac/sdk/expo-plugin` |
+| App móvil | **Expo + React Native** (no Flutter) | Expo **≥ 54**, `react-native-bare-kit`, `@qvac/sdk/expo-plugin` |
 | Empaquetado desktop | Electron Forge + `QvacForgePlugin` | Tutorial QVAC Electron |
 | Empaquetado móvil | Prebuild nativo Expo | `npx expo run:android --device` — no Expo Go, no emulador |
 | Host Node (desktop / CI) | Node.js **≥ 22.17**, npm **≥ 10.9** | Requisito del SDK |
@@ -31,6 +31,7 @@ Versiones y runtime **fijados**. Un hexágono, dos toolchains; no se mezcla un s
 
 ## Qué queda fuera
 
+- **Flutter.** QVAC no publica SDK Dart/BareKit para Flutter; el Nano no se carga en un engine Flutter. Ver ADR 0009.
 - Kotlin/Jetpack como app (Android Studio es toolchain: `adb`, SDK).
 - Python `tetherto-qvac-sdk`.
 - OCR `ggml-ocr` (VisionPsy cubre el comprobante).

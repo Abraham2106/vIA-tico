@@ -19,3 +19,4 @@ El celular corre VisionPsy; el PC corre el LLM pesado. El escritorio debe **most
 - Emparejamiento (QR / clave del provider) es un caso de uso (`pair-devices`).
 - Sin esas pantallas de export en el teléfono.
 - Kotlin nativo no es el stack de producto (sí el toolchain `adb`/SDK).
+- **Flutter tampoco:** el móvil es Expo / React Native (ADR 0009).
