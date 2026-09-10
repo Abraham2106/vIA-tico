@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "ViáticoCero",
+    "slug": "viaticocero",
+    "scheme": "viaticocero",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ViáticoCero necesita la foto del comprobante.",
+          "cameraPermission": "ViáticoCero captura el comprobante en el dispositivo."
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.viaticocero.mobile",
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES"]
+    },
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

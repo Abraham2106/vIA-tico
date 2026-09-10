@@ -1,0 +1,35 @@
+{
+  "name": "viaticocero",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Liquidación de viáticos local-first. La IA interpreta; el código autoriza.",
+  "type": "module",
+  "workspaces": [
+    "packages/contracts",
+    "packages/core",
+    "apps/desktop",
+    "apps/mobile"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit --pretty false -p tsconfig.json && tsc --noEmit --pretty false -p apps/desktop/tsconfig.web.json",
+    "lint": "eslint .",
+    "desktop:web": "npm run dev:web --workspace=@viaticocero/desktop",
+    "desktop:build:web": "npm run build:web --workspace=@viaticocero/desktop",
+    "desktop:dev": "npm run dev --workspace=@viaticocero/desktop",
+    "mobile:start": "npm run start --workspace=@viaticocero/mobile"
+  },
+  "engines": {
+    "node": ">=22.14.0",
+    "npm": ">=10.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/node": "^22.18.1",
+    "eslint": "^9.35.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0",
+    "vitest": "^3.2.4"
+  }
+}
