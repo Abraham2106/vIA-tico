@@ -17,7 +17,8 @@ El hexágono, los contratos y las apps (sin motor QVAC) ya están en el árbol. 
 | [06-como-trabajar-monorepo.md](./06-como-trabajar-monorepo.md) | Día a día + skills |
 | [07-autoridad-pipeline.md](./07-autoridad-pipeline.md) | Schema, motivo sin veredicto, dígitos, política |
 | [08-demo-evals.md](./08-demo-evals.md) | Demo ⚠ de la cuña, golden set, tracks |
-| [adr/](./adr/) | 0001–0009 runtime; 0010–0013 producto |
+| [09-ui-ux.md](./09-ui-ux.md) | Desktop Carbon / IBM Products; móvil tokens; IA UX |
+| [adr/](./adr/) | 0001–0009 runtime; 0010–0014 producto |
 
 ## Producto (una línea)
 

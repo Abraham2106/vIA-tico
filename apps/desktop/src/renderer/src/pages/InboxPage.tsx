@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableHeader, TableRow, TextArea } from '@carbon/react'
 import { parseAnalysisJob } from '@viaticocero/contracts'
 import { type WorkspaceSnapshot } from '@viaticocero/core'
+import { AppEmptyState } from '../components/AppEmptyState'
+import { PageScaffold } from '../components/PageScaffold'
 import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
 
 type Props = {
@@ -43,61 +46,48 @@ export function InboxPage({ snapshot, api, onChange }: Props) {
   }
 
   return (
-    <div>
-      <div className="page-head">
-        <div>
-          <h1>Inbox</h1>
-          <p>Camino de producto: analysis-job JSON (teléfono → escritorio). No es delegated inference.</p>
-        </div>
-      </div>
-      <div className="detail">
-        <div className="card" style={{ padding: 0 }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Job</th>
-                <th>Viaje</th>
-                <th>Proveedor</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.jobs.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="muted">
-                    Vacío. Pega un DTO o impórtalo desde el móvil.
-                  </td>
-                </tr>
-              ) : (
-                snapshot.jobs.map((job) => (
-                  <tr key={job.id}>
-                    <td className="mono">{job.id}</td>
-                    <td className="mono">{job.tripId ?? '—'}</td>
-                    <td>{job.visionResult.proveedor}</td>
-                    <td>{job.status}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="card">
-          <strong>Pegar analysis-job</strong>
-          <textarea
-            className="mono"
-            rows={16}
-            value={raw}
-            onChange={(event) => setRaw(event.target.value)}
-            style={{ marginTop: 10 }}
-          />
-          <div className="row" style={{ marginTop: 12 }}>
-            <button className="btn primary" onClick={() => void ingest()}>
-              Ingestar
-            </button>
-            {message ? <span className="muted">{message}</span> : null}
-          </div>
-        </div>
-      </div>
-    </div>
+    <PageScaffold
+      title="Inbox"
+      subtitle="analysis-job JSON del teléfono al escritorio. No es delegated inference."
+    >
+      {snapshot.jobs.length === 0 ? (
+        <AppEmptyState title="Inbox vacío" subtitle="Pega un analysis-job o envíalo desde el celular." />
+      ) : (
+        <TableContainer>
+          <Table size="lg" aria-label="Jobs ingestados">
+            <TableHead>
+              <TableRow>
+                <TableHeader>Job</TableHeader>
+                <TableHeader>Viaje</TableHeader>
+                <TableHeader>Proveedor</TableHeader>
+                <TableHeader>Estado</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {snapshot.jobs.map((job) => (
+                <TableRow key={job.id}>
+                  <TableCell className="vz-num">{job.id}</TableCell>
+                  <TableCell className="vz-num">{job.tripId ?? '—'}</TableCell>
+                  <TableCell>{job.visionResult.proveedor}</TableCell>
+                  <TableCell>{job.status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      <TextArea
+        id="job-json"
+        labelText="Pegar analysis-job"
+        value={raw}
+        onChange={(event) => setRaw(event.target.value)}
+        rows={14}
+        style={{ marginTop: '1.5rem', fontFamily: '"IBM Plex Mono", monospace' }}
+      />
+      <Button style={{ marginTop: '1rem' }} onClick={() => void ingest()}>
+        Ingestar
+      </Button>
+      {message ? <p className="cds--label-01">{message}</p> : null}
+    </PageScaffold>
   )
 }

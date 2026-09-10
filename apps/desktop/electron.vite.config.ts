@@ -3,10 +3,24 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 
 const workspace = fileURLToPath(new URL('../..', import.meta.url))
-const aliases = {
-  '@viaticocero/contracts': `${workspace}/packages/contracts/index.ts`,
-  '@viaticocero/core': `${workspace}/packages/core/index.ts`,
-}
+const aliases = [
+  {
+    find: '@viaticocero/ui-tokens/tokens.css',
+    replacement: `${workspace}/packages/ui-tokens/tokens.css`,
+  },
+  {
+    find: '@viaticocero/ui-tokens',
+    replacement: `${workspace}/packages/ui-tokens/index.ts`,
+  },
+  {
+    find: '@viaticocero/contracts',
+    replacement: `${workspace}/packages/contracts/index.ts`,
+  },
+  {
+    find: '@viaticocero/core',
+    replacement: `${workspace}/packages/core/index.ts`,
+  },
+]
 
 export default defineConfig({
   main: {

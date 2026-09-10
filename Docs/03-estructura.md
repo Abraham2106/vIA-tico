@@ -47,6 +47,7 @@ vIA-tico/
 │       ├── analysis-job/
 │       ├── pairing/
 │       └── export-formats/
+│   └── ui-tokens/                         # fechas/categorías; color para móvil (desktop = Carbon)
 ├── apps/
 │   ├── desktop/
 │   │   ├── src/

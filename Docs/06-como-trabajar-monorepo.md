@@ -10,6 +10,7 @@ ViáticoCero es **un repo, dos apps, un hexágono**. Las reglas cortas para huma
    - JSON teléfono ↔ PC → `packages/contracts` (schema, no texto libre)
    - Cámara, motivo libre o VisionPsy → `apps/mobile` (Expo/RN, **no Flutter**)
    - Centro de excepciones, conciliación, auditoría, PDF/Excel → `apps/desktop`
+   - Color, spacing, tema → `packages/ui-tokens` (ADR 0014). Componentes React se quedan en cada app.
 3. Un PR puede tocar varios paquetes si el DTO o un caso de uso cruza dispositivos.
 4. Workspaces npm en la raíz (`packages/*` + `apps/*`). Expo y Electron **no** comparten un solo manifiesto de app; cada una tiene el suyo. `.npmrc` usa `install-strategy=nested` para no pelear React DOM vs React Native.
 
@@ -31,6 +32,6 @@ En el chat del Agent: `/viaticocero-monorepo`, `/qvac-sdk`, etc.
 
 ## Relación con Docs/
 
-`Docs/` justifica **por qué**. Empieza por [00-producto.md](./00-producto.md): **tesis** (excepciones documentales financieras) y **cuña** (viáticos). Las skills dicen **cómo debe comportarse el agente**. Si chocan, gana el ADR (0013 scaffold; 0010–0012 producto; 0001–0009 runtime).
+`Docs/` justifica **por qué**. Empieza por [00-producto.md](./00-producto.md): **tesis** (excepciones documentales financieras) y **cuña** (viáticos). Las skills dicen **cómo debe comportarse el agente**. Si chocan, gana el ADR (0013 scaffold; 0010–0012 producto; 0014 UI; 0001–0009 runtime).
 
 No revivas `src/` en la raíz (scaffold de una sola app, PR #1).

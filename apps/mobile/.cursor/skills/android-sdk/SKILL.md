@@ -21,6 +21,7 @@ La app de producto en el teléfono es **Expo + React Native + QVAC**. **No Flutt
 ## Qué vive aquí
 
 - Expo Router: `apps/mobile/app/{capture,motive,preview,pairing}`.
+- Tema: `src/theme.ts` lee `@viaticocero/ui-tokens` (ADR 0014). No hex sueltos de la era teal.
 - Adaptadores: `qvac-visionpsy`, `camera`, `filesystem`.
 - Composition: `src/composition/expo`.
 - Worker: `apps/mobile/qvac/` + `config/qvac`.

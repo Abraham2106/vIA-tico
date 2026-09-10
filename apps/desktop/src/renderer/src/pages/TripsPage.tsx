@@ -1,5 +1,24 @@
 import { useState } from 'react'
+import {
+  Button,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  NumberInput,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tag,
+  TextInput,
+} from '@carbon/react'
 import { formatMoney, type WorkspaceSnapshot } from '@viaticocero/core'
+import { formatDisplayDate } from '@viaticocero/ui-tokens'
+import { PageScaffold } from '../components/PageScaffold'
+import { toIsoDate } from '../lib/isoDate'
 import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
 
 type Props = {
@@ -32,77 +51,94 @@ export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
   }
 
   return (
-    <div>
-      <div className="page-head">
-        <div>
-          <h1>Viajes</h1>
-          <p>El comprobante vive en un viaje. Sin ventana de fechas no hay veredicto útil.</p>
-        </div>
-      </div>
-      <div className="detail">
-        <div className="card" style={{ padding: 0 }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Destino</th>
-                <th>Período</th>
-                <th>Adelanto</th>
-                <th>Estado</th>
-                <th>Comprobantes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.trips.map((trip) => (
-                <tr key={trip.id} className="clickable" onClick={() => onOpenTrip(trip.id)}>
-                  <td>{trip.destination}</td>
-                  <td className="mono">
-                    {trip.startDate} – {trip.endDate}
-                  </td>
-                  <td>{formatMoney(trip.advance)}</td>
-                  <td>{trip.status === 'open' ? 'Abierto' : 'Liquidado'}</td>
-                  <td>{snapshot.receipts.filter((item) => item.tripId === trip.id).length}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <form
-          className="card"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void createTrip()
+    <PageScaffold
+      title="Viajes"
+      subtitle="El comprobante vive en un viaje. Sin ventana de fechas no hay veredicto útil."
+    >
+      <TableContainer>
+        <Table size="lg" aria-label="Viajes">
+          <TableHead>
+            <TableRow>
+              <TableHeader>Destino</TableHeader>
+              <TableHeader>Período</TableHeader>
+              <TableHeader>Adelanto</TableHeader>
+              <TableHeader>Estado</TableHeader>
+              <TableHeader>Comprobantes</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {snapshot.trips.map((trip) => (
+              <TableRow key={trip.id} onClick={() => onOpenTrip(trip.id)}>
+                <TableCell>{trip.destination}</TableCell>
+                <TableCell className="vz-num">
+                  {formatDisplayDate(trip.startDate)} – {formatDisplayDate(trip.endDate)}
+                </TableCell>
+                <TableCell className="vz-num">{formatMoney(trip.advance)}</TableCell>
+                <TableCell>
+                  <Tag type={trip.status === 'open' ? 'blue' : 'green'} size="sm">
+                    {trip.status === 'open' ? 'Abierto' : 'Liquidado'}
+                  </Tag>
+                </TableCell>
+                <TableCell>{snapshot.receipts.filter((item) => item.tripId === trip.id).length}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Form
+        aria-label="Registrar viaje"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void createTrip()
+        }}
+      >
+        <h3 className="cds--heading-compact-01">Registrar viaje</h3>
+        <TextInput
+          id="destino"
+          labelText="Destino"
+          value={destination}
+          onChange={(event) => setDestination(event.target.value)}
+        />
+        <DatePicker
+          datePickerType="single"
+          dateFormat="Y-m-d"
+          value={startDate}
+          onChange={(dates) => {
+            const next = dates[0]
+            if (next) setStartDate(toIsoDate(next))
           }}
         >
-          <strong>Registrar viaje</strong>
-          <div className="form-grid" style={{ marginTop: 12 }}>
-            <label>
-              Destino
-              <input value={destination} onChange={(event) => setDestination(event.target.value)} />
-            </label>
-            <label>
-              Inicio
-              <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-            </label>
-            <label>
-              Fin
-              <input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
-            </label>
-            <label>
-              Adelanto
-              <input type="number" value={advance} onChange={(event) => setAdvance(Number(event.target.value))} />
-            </label>
-          </div>
-          <label style={{ marginTop: 12 }}>
-            Motivo
-            <input value={purpose} onChange={(event) => setPurpose(event.target.value)} />
-          </label>
-          <div className="row" style={{ marginTop: 14 }}>
-            <button className="btn primary" type="submit" disabled={!traveler}>
-              Crear viaje
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <DatePickerInput id="inicio" labelText="Inicio" placeholder="yyyy-mm-dd" />
+        </DatePicker>
+        <DatePicker
+          datePickerType="single"
+          dateFormat="Y-m-d"
+          value={endDate}
+          onChange={(dates) => {
+            const next = dates[0]
+            if (next) setEndDate(toIsoDate(next))
+          }}
+        >
+          <DatePickerInput id="fin" labelText="Fin" placeholder="yyyy-mm-dd" />
+        </DatePicker>
+        <NumberInput
+          id="adelanto"
+          label="Adelanto"
+          value={advance}
+          hideSteppers
+          onChange={(_, state) => setAdvance(Number(state.value))}
+        />
+        <TextInput
+          id="motivo"
+          labelText="Motivo"
+          value={purpose}
+          onChange={(event) => setPurpose(event.target.value)}
+        />
+        <Button type="submit" disabled={!traveler}>
+          Crear viaje
+        </Button>
+      </Form>
+    </PageScaffold>
   )
 }

@@ -4,7 +4,8 @@
     "strict": true,
     "paths": {
       "@viaticocero/contracts": ["../../packages/contracts/index.ts"],
-      "@viaticocero/core": ["../../packages/core/index.ts"]
+      "@viaticocero/core": ["../../packages/core/index.ts"],
+      "@viaticocero/ui-tokens": ["../../packages/ui-tokens/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

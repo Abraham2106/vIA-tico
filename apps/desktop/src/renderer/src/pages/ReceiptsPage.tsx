@@ -1,7 +1,30 @@
 import { useMemo, useState } from 'react'
+import {
+  Button,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  NumberInput,
+  Select,
+  SelectItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TextInput,
+} from '@carbon/react'
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from '@viaticocero/contracts'
 import { effectiveVerdict, formatMoney, type WorkspaceSnapshot } from '@viaticocero/core'
+import { CATEGORY_LABELS, formatDisplayDate } from '@viaticocero/ui-tokens'
+import { AppEmptyState } from '../components/AppEmptyState'
+import { CategoryChip } from '../components/CategoryChip'
+import { ConfidenceBar } from '../components/ConfidenceBar'
+import { PageScaffold } from '../components/PageScaffold'
 import { VerdictPill } from '../components/VerdictPill'
+import { toIsoDate } from '../lib/isoDate'
 import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
 
 type Props = {
@@ -46,102 +69,117 @@ export function ReceiptsPage({ snapshot, api, onChange, focusTripId }: Props) {
     await onChange()
   }
 
-  if (!trip) return <div className="card empty">No hay viajes.</div>
+  if (!trip) {
+    return (
+      <PageScaffold title="Comprobantes">
+        <AppEmptyState title="No hay viajes" subtitle="Registra un viaje antes de adjuntar comprobantes." />
+      </PageScaffold>
+    )
+  }
 
   return (
-    <div>
-      <div className="page-head">
-        <div>
-          <h1>{trip.destination}</h1>
-          <p>
-            {trip.startDate} – {trip.endDate} · adelanto {formatMoney(trip.advance)} · {counts.procede}{' '}
-            PROCEDE · {counts.revision} en revisión
-          </p>
-        </div>
-      </div>
-      <div className="detail">
-        <div className="card" style={{ padding: 0 }}>
-          <table>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Proveedor</th>
-                <th>Fecha</th>
-                <th>Monto</th>
-                <th>Categoría</th>
-                <th>Veredicto</th>
-              </tr>
-            </thead>
-            <tbody>
+    <PageScaffold
+      title={trip.destination}
+      subtitle={`${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)} · adelanto ${formatMoney(trip.advance)}`}
+      tags={[
+        { label: `${counts.procede} PROCEDE`, type: 'green' },
+        { label: `${counts.revision} revisión`, type: 'warm-gray' },
+      ]}
+    >
+      {receipts.length === 0 ? (
+        <AppEmptyState title="Sin comprobantes" subtitle="Adjunta un DTO o captura desde el celular." />
+      ) : (
+        <TableContainer>
+          <Table size="lg" aria-label="Comprobantes del viaje">
+            <TableHead>
+              <TableRow>
+                <TableHeader>Proveedor</TableHeader>
+                <TableHeader>Fecha</TableHeader>
+                <TableHeader>Monto</TableHeader>
+                <TableHeader>Categoría</TableHeader>
+                <TableHeader>Veredicto</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {receipts.map((receipt) => {
-                const verdict = effectiveVerdict(receipt)
+                const extraction = receipt.usedExtraction
                 return (
-                  <tr key={receipt.id}>
-                    <td>{verdict === 'PROCEDE' ? '✓' : '⚠'}</td>
-                    <td>{receipt.usedExtraction.proveedor}</td>
-                    <td className="mono">{receipt.usedExtraction.fecha}</td>
-                    <td className="mono">{receipt.usedExtraction.monto}</td>
-                    <td>{receipt.usedExtraction.categoria ?? '—'}</td>
-                    <td>
-                      <VerdictPill verdict={verdict} />
-                    </td>
-                  </tr>
+                  <TableRow key={receipt.id}>
+                    <TableCell>{extraction.proveedor}</TableCell>
+                    <TableCell className="vz-num">{formatDisplayDate(extraction.fecha)}</TableCell>
+                    <TableCell className="vz-num">
+                      {formatMoney({ amount: extraction.monto, currency: extraction.moneda })}
+                    </TableCell>
+                    <TableCell>
+                      <CategoryChip category={extraction.categoria} source="ai" />
+                    </TableCell>
+                    <TableCell>
+                      <VerdictPill verdict={effectiveVerdict(receipt)} />
+                    </TableCell>
+                  </TableRow>
                 )
               })}
-            </tbody>
-          </table>
-        </div>
-        <form
-          className="card"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void attach()
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      <Form
+        aria-label="Adjuntar comprobante"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void attach()
+        }}
+      >
+        <h3 className="cds--heading-compact-01">Adjuntar comprobante (DTO)</h3>
+        <p className="cds--label-01">VisionPsy no está cableado. El DTO entra igual al motor de reglas.</p>
+        <TextInput
+          id="proveedor"
+          labelText="Proveedor"
+          value={proveedor}
+          onChange={(event) => setProveedor(event.target.value)}
+        />
+        <DatePicker
+          datePickerType="single"
+          dateFormat="Y-m-d"
+          value={fecha}
+          onChange={(dates) => {
+            const next = dates[0]
+            if (next) setFecha(toIsoDate(next))
           }}
         >
-          <strong>Adjuntar comprobante (manual / DTO)</strong>
-          <p className="muted">VisionPsy no está cableado. El DTO entra igual al motor de reglas.</p>
-          <div className="form-grid" style={{ marginTop: 12 }}>
-            <label>
-              Proveedor
-              <input value={proveedor} onChange={(event) => setProveedor(event.target.value)} />
-            </label>
-            <label>
-              Fecha
-              <input type="date" value={fecha} onChange={(event) => setFecha(event.target.value)} />
-            </label>
-            <label>
-              Monto
-              <input type="number" value={monto} onChange={(event) => setMonto(Number(event.target.value))} />
-            </label>
-            <label>
-              Categoría
-              <select value={categoria} onChange={(event) => setCategoria(event.target.value as ReceiptCategory)}>
-                {RECEIPT_CATEGORIES.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Confianza
-              <select
-                value={confianza}
-                onChange={(event) => setConfianza(event.target.value as 'alta' | 'media' | 'baja')}
-              >
-                <option value="alta">alta</option>
-                <option value="media">media</option>
-                <option value="baja">baja</option>
-              </select>
-            </label>
-          </div>
-          <div className="row" style={{ marginTop: 14 }}>
-            <button className="btn primary" type="submit">
-              Validar y adjuntar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <DatePickerInput id="fecha" labelText="Fecha" placeholder="yyyy-mm-dd" />
+        </DatePicker>
+        <NumberInput
+          id="monto"
+          label="Monto"
+          value={monto}
+          hideSteppers
+          onChange={(_, state) => setMonto(Number(state.value))}
+        />
+        <Select
+          id="categoria"
+          labelText="Categoría"
+          value={categoria}
+          onChange={(event) => setCategoria(event.target.value as ReceiptCategory)}
+        >
+          {RECEIPT_CATEGORIES.map((item) => (
+            <SelectItem key={item} value={item} text={CATEGORY_LABELS[item]} />
+          ))}
+        </Select>
+        <Select
+          id="confianza"
+          labelText="Confianza de lectura"
+          value={confianza}
+          onChange={(event) => setConfianza(event.target.value as 'alta' | 'media' | 'baja')}
+        >
+          <SelectItem value="alta" text="Alta" />
+          <SelectItem value="media" text="Media — confirmar" />
+          <SelectItem value="baja" text="Baja — revisar datos" />
+        </Select>
+        <ConfidenceBar level={confianza} />
+        <Button type="submit">Validar y adjuntar</Button>
+      </Form>
+    </PageScaffold>
   )
 }
