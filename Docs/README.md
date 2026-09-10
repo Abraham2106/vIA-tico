@@ -1,22 +1,24 @@
 # ViáticoCero — documentación
 
-Índice del approach actual. El texto que describía «app de escritorio que lee un recibo y exporta» quedó sustituido por producto + autoridad + demo (00, 07, 08, ADRs 0010–0012). El hexágono, el monorepo y el pin QVAC 0.18.2 **se mantienen**.
+**Tesis:** excepciones documentales financieras. **Cuña:** viáticos (etapa 1).  
+Canónico: [`00-producto.md`](./00-producto.md). Carpetas de la cuña: [`03-estructura.md`](./03-estructura.md) + ADR 0013.
 
 El hexágono, los contratos y las apps (sin motor QVAC) ya están en el árbol. Los ADRs siguen mandando.
 
+
 | Documento | Qué responde |
 | --- | --- |
-| [00-producto.md](./00-producto.md) | Problema, filosofía, etapa 1, por qué QVAC |
-| [01-stack.md](./01-stack.md) | QVAC **0.18.2**, VisionPsy en el celular, Qwen Instruct en desktop, Expo + Electron |
-| [02-arquitectura-hexagonal.md](./02-arquitectura-hexagonal.md) | Puertos; el veredicto vive en `packages/core` |
-| [03-estructura.md](./03-estructura.md) | Monorepo `apps/` + `packages/` |
-| [04-qvac-visionpsy-bare.md](./04-qvac-visionpsy-bare.md) | Modelos, Flash/Base, Bare, P2P opcional |
-| [05-referencias.md](./05-referencias.md) | Tutoriales Tether; JarvisQ/Beacon solo como forma |
+| [00-producto.md](./00-producto.md) | Tesis + cuña (18 puntos). Léase el bloque inicial antes de los ejemplos de viaje |
+| [01-stack.md](./01-stack.md) | QVAC **0.18.2**, VisionPsy en el celular, Qwen Instruct en desktop |
+| [02-arquitectura-hexagonal.md](./02-arquitectura-hexagonal.md) | Puertos; `verdict` solo en core |
+| [03-estructura.md](./03-estructura.md) | Árbol de la **cuña** (etapa 1); etapas 2–3 sin paquetes |
+| [04-qvac-visionpsy-bare.md](./04-qvac-visionpsy-bare.md) | Modelos, Flash/Base, Bare |
+| [05-referencias.md](./05-referencias.md) | Tutoriales Tether |
 | [06-como-trabajar-monorepo.md](./06-como-trabajar-monorepo.md) | Día a día + skills |
-| [07-autoridad-pipeline.md](./07-autoridad-pipeline.md) | Schema, dígitos, política, daño acotado |
-| [08-demo-evals.md](./08-demo-evals.md) | Demo de 10 s, golden set, tracks Psy / edge |
-| [adr/](./adr/) | 0001–0009 (runtime) y 0010–0012 (producto) |
+| [07-autoridad-pipeline.md](./07-autoridad-pipeline.md) | Schema, motivo sin veredicto, dígitos, política |
+| [08-demo-evals.md](./08-demo-evals.md) | Demo ⚠ de la cuña, golden set, tracks |
+| [adr/](./adr/) | 0001–0009 runtime; 0010–0013 producto |
 
 ## Producto (una línea)
 
-Teléfono: VisionPsy comprende el comprobante on-device. Escritorio: reglas + centro de excepciones + liquidación. El modelo no autoriza dinero.
+Sistema de excepciones sobre documentos financieros, on-device. Primera instancia: un viaje. El modelo no autoriza dinero.

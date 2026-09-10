@@ -18,7 +18,7 @@ apps/desktop/src/preload
 apps/desktop/src/renderer/src   # React + Vite — SIN @qvac/sdk
 ```
 
-Features UI: `exceptions` (primaria), `inbox`, `receipts`, `trips`, `settlements`, `export`.
+Features UI: `exceptions` (primaria), `audit`, `inbox`, `receipts`, `trips`, `settlements`, `export`.
 
 ## Proceso main
 

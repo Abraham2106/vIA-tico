@@ -1,91 +1,106 @@
 # Estructura de carpetas
 
-Solo carpetas con `.gitkeep`. `package.json`, workspaces npm/pnpm, `app.json` y `qvac.config.json` van en un PR de implementación.
+Solo `.gitkeep`. Manifiestos (`package.json`, workspaces, `app.json`, `qvac.config.json`) van en un PR de implementación.
+
+El árbol **es la cuña** (viáticos, ADR 0013), no toda la tesis. La tesis es excepciones documentales financieras; etapas 2–3 (gastos genéricos, matching OC, ERP) **no** tienen paquetes.
 
 ```
 vIA-tico/
-├── Docs/
+├── Docs/                                  # 00 = tesis 18 puntos
 ├── packages/
 │   ├── core/                              # HEXÁGONO — prohibido Expo/Electron/QVAC
-│   │   ├── domain/{traveler,trip,receipt,policy,exception,settlement,shared}/
+│   │   ├── domain/
+│   │   │   ├── traveler/
+│   │   │   ├── trip/                      # §3 contexto + adelanto
+│   │   │   ├── receipt/
+│   │   │   ├── category/                  # §7 categorías de gasto
+│   │   │   ├── policy/
+│   │   │   ├── exception/                 # §2
+│   │   │   ├── settlement/                # §6 liquidación
+│   │   │   ├── audit/                     # §10
+│   │   │   └── shared/
 │   │   └── application/
 │   │       ├── ports/{inbound,outbound}/
 │   │       └── use-cases/
 │   │           ├── register-trip/
 │   │           ├── attach-receipt/
-│   │           ├── analyze-receipt/       # visión (móvil)
-│   │           ├── ingest-vision-result/  # desktop recibe el DTO
+│   │           ├── declare-motive/        # §7 texto libre (móvil)
+│   │           ├── analyze-receipt/       # §4 VisionPsy (móvil)
+│   │           ├── ingest-vision-result/
 │   │           ├── analyze-with-llm/      # postproceso lingüístico (desktop)
-│   │           ├── validate-extraction/   # dígitos / schema — código
-│   │           ├── validate-policy/       # viaje, topes — código
-│   │           ├── detect-duplicates/
-│   │           ├── open-exception/
+│   │           ├── classify-motive/       # §7 Instruct; SIN veredicto
+│   │           ├── validate-extraction/   # schema / dígitos
+│   │           ├── validate-policy/       # §3 viaje, topes, confianza
+│   │           ├── detect-duplicates/     # §5
+│   │           ├── open-exception/        # §2
+│   │           ├── resolve-exception/
+│   │           ├── reconcile-advance/     # §6
 │   │           ├── settle-trip/
-│   │           ├── export-report/
+│   │           ├── record-audit/          # §10
+│   │           ├── export-report/         # §12
 │   │           └── pair-devices/
-│   └── contracts/                         # handshake; ambas apps pueden importar
-│       ├── vision-result/                 # schema + confianza + RAW
+│   └── contracts/
+│       ├── vision-result/                 # §4 JSON + confianza + RAW
+│       ├── motive-classification/         # §7 categoría + confianza; no veredicto
+│       ├── verdict/                       # §8 solo lo emite core
+│       ├── audit-event/                   # §10
 │       ├── analysis-job/
 │       ├── pairing/
 │       └── export-formats/
 ├── apps/
-│   ├── desktop/                           # registro + excepciones
+│   ├── desktop/
 │   │   ├── src/
-│   │   │   ├── main/
-│   │   │   ├── preload/
+│   │   │   ├── main/ | preload/
 │   │   │   ├── renderer/src/
-│   │   │   │   ├── features/{inbox,exceptions,receipts,trips,settlements,export}/
+│   │   │   │   ├── features/{inbox,exceptions,audit,receipts,trips,settlements,export}/
 │   │   │   │   └── {assets,components,hooks,pages,styles}/
-│   │   │   ├── adapters/
-│   │   │   │   ├── driven/
-│   │   │   │   │   ├── qvac-llm/
-│   │   │   │   │   ├── qvac-provider/
-│   │   │   │   │   ├── exporters/{pdf,csv,xlsx,json}/
-│   │   │   │   │   └── {filesystem,persistence,clock}/
-│   │   │   │   └── driving/{ipc,renderer-bridge}/
+│   │   │   ├── adapters/driven/{qvac-llm,qvac-provider,exporters/{pdf,csv,xlsx,json},filesystem,persistence,clock}/
+│   │   │   ├── adapters/driving/{ipc,renderer-bridge}/
 │   │   │   └── composition/{electron,bare}/
-│   │   ├── config/qvac/
-│   │   ├── qvac/
+│   │   ├── config/qvac/ | qvac/
 │   │   ├── resources/{icons,models}/
 │   │   └── tests/{e2e,integration/qvac}/
-│   └── mobile/                            # captura + VisionPsy
-│       ├── app/{capture,preview,pairing}/
-│       ├── src/
-│       │   ├── adapters/
-│       │   │   ├── driven/{qvac-visionpsy,camera,filesystem}/
-│       │   │   └── driving/screens/
-│       │   └── composition/expo/
-│       ├── config/qvac/
-│       ├── qvac/
-│       ├── resources/samples/receipts/    # golden set (ADR 0012)
+│   └── mobile/
+│       ├── app/{capture,motive,preview,pairing}/
+│       ├── src/adapters/driven/{qvac-visionpsy,camera,filesystem}/
+│       ├── src/adapters/driving/screens/
+│       ├── src/composition/expo/
+│       ├── config/qvac/ | qvac/
+│       ├── resources/samples/receipts/
 │       └── tests/{e2e,integration/qvac}/
-└── tests/unit/{domain,application}/       # veredictos, sin GPU
+└── tests/unit/{domain,application}/
 ```
 
 La raíz **`src/`** del scaffold de una sola app (PR #1) no se revive.
 
-## Por qué monorepo (y no un solo paquete)
+## Tesis → carpeta
 
-Expo y electron-vite pelean: Metro vs Vite, React Native vs `react-dom`, `expo-plugin` vs `QvacForgePlugin`. Dos repos romperían el pin 0.18.2 y los DTOs.
+| § | Capacidad | Scaffold |
+| --- | --- | --- |
+| 2 | Centro de excepciones | `exception`, `open-exception`, `resolve-exception`, `features/exceptions` |
+| 3 | Viaje como contexto | `trip`, `validate-policy` |
+| 4 | Documento → JSON | `analyze-receipt`, `vision-result` |
+| 5 | Duplicados | `detect-duplicates` |
+| 6 | Conciliación | `reconcile-advance`, `settle-trip`, `features/settlements` |
+| 7 | Motivo libre | `declare-motive`, `classify-motive`, `category`, `motive-classification`, `app/motive` |
+| 8 | PROCEDE / REVISIÓN / NO PROCEDE | `verdict` (solo core) |
+| 9 | Confianza | campos en `vision-result` y `motive-classification` |
+| 10 | Auditoría | `audit`, `record-audit`, `audit-event`, `features/audit` |
+| 12 | CSV / Excel / JSON | `export-report`, `export-formats` |
+| 14–18 | Etapas 2–3 | ninguna carpeta |
 
-Workspaces se declaran cuando existan los manifiestos.
+## Por qué monorepo
+
+Expo y electron-vite pelean. Workspaces cuando existan manifiestos.
 
 ## Por qué `apps/desktop/src/main|preload|renderer`
 
-El tutorial QVAC y `QvacForgePlugin` asumen esa forma **dentro del paquete Electron**. `cwd` de Forge/Vite = esa app. `dist/main|preload|renderer` evita el choque con `out/` de Forge.
+Tutorial QVAC + `QvacForgePlugin` dentro del paquete Electron.
 
 ## Por qué `app/` en móvil
 
-Expo Router monta rutas desde `app/` en la raíz del paquete.
+Expo Router. `motive` es la pantalla del texto libre (§7), no liquidación.
 
-## Bundles QVAC separados
+## Bundles QVAC
 
-Cada app tiene `qvac/` y `config/qvac/`. El worker del teléfono no arrastra el GGUF de Qwen.
-
-## Compositions
-
-**Desktop `composition/electron`:** Qwen Instruct, persistencia, exporters, provider opcional, `--no-sandbox` en Linux.
-
-**Desktop `composition/bare`:** `bare-process` + `plugins([llmPlugin])` si el proceso *es* Bare.
-
-**Mobile `composition/expo`:** `expo-plugin`, VisionPsy, cámara, transporte del DTO. Device físico; Expo Go no carga los addons C++.
+Cada app: `qvac/` + `config/qvac/`. El teléfono no arrastra Qwen.

@@ -10,8 +10,8 @@ El celular corre VisionPsy; el PC corre Qwen Instruct y es el sistema de registr
 
 ## Decisión
 
-- `apps/mobile`: cámara, preview del DTO, pairing, envío.
-- `apps/desktop`: inbox, **centro de excepciones**, liquidación, persistencia, exporters (PDF, CSV, XLSX, JSON), provider P2P opcional.
+- `apps/mobile`: cámara, **motivo libre**, preview del DTO, pairing, envío.
+- `apps/desktop`: **centro de excepciones**, conciliación, auditoría, persistencia, exporters, Qwen Instruct, provider P2P opcional.
 - El desktop es el sistema de registro. El veredicto (`PROCEDE | REVISIÓN | NO PROCEDE`) sale de `packages/core`, no de la UI ni del LLM (ADR 0010, 0011).
 
 ## Consecuencias

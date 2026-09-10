@@ -34,7 +34,7 @@ Fuentes oficiales de QVAC y tutoriales Tether.
 | Electron `src/renderer` | `apps/desktop/src/renderer` (excepciones, liquidación, export) |
 | Electron `qvac/` | `apps/desktop/qvac/` |
 | Expo `app.json` plugins | `apps/mobile` (manifiesto aún no creado) |
-| Expo pantallas | `apps/mobile/app/{capture,preview,pairing}` |
+| Expo pantallas | `apps/mobile/app/{capture,motive,preview,pairing}` |
 | Expo VisionPsy | `apps/mobile/src/adapters/driven/qvac-visionpsy` |
 | DTOs | `packages/contracts/*` |
 | Dominio | `packages/core` |

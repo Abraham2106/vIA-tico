@@ -10,10 +10,11 @@ Sin output restringido ni casos repetibles, el pipeline vuelve a ser un chat sob
 
 ## Decisión
 
-- `packages/contracts/vision-result` es schema estricto (proveedor, fecha, monto, moneda, tipo, confianza, raw). Texto libre del modelo no entra al dominio.
+- `packages/contracts/vision-result` y `motive-classification` son schema estricto. **Ninguno** lleva `veredicto`.
+- Confianza baja o media en lectura o clasificación → `REVISIÓN`.
+- Golden set: período inválido, duplicado, ticket denso, ilegible, motivo ambiguo, y varios PROCEDE.
 - Se conserva RAW. Un segundo modelo no es fuente de verdad numérica.
-- Golden set: al menos período inválido, duplicado, ticket denso, ilegible, y varios PROCEDE.
-- Tests de política/duplicados/dígitos en `tests/unit` (sin GGUF). Integración VisionPsy en device físico.
+- Tests de política/duplicados/dígitos/motivo en `tests/unit` (sin GGUF). Integración VisionPsy en device físico.
 - Perfil **Base** para comprobantes densos si la RAM del teléfono da; **Flash** cuando el criterio es latencia. No mezclar mmproj y `image_no_upscale`.
 
 ## Consecuencias
