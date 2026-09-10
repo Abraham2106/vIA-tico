@@ -5,12 +5,15 @@ El dominio de viáticos no depende de Expo, Electron, Bare ni de las constantes 
 ## Regla de dependencia
 
 ```
-móvil (cámara)  →  analyze-receipt (VisionPsy)  →  DTO schema (contracts)
-                                                      ↓
-desktop  →  ingest-vision-result → postproceso LLM (opcional)
-         →  validate-extraction / validate-policy / duplicates
-         →  PROCEDE | REVISIÓN | NO PROCEDE
-         →  centro de excepciones / liquidación / export
+móvil: cámara + motivo libre
+        → analyze-receipt (VisionPsy)     → vision-result
+        → declare-motive                  → texto
+                      ↓
+desktop: ingest → postproceso lingüístico
+       → classify-motive                  → motive-classification (sin veredicto)
+       → validate-extraction / policy / duplicates
+       → verdict en core: PROCEDE | REVISIÓN | NO PROCEDE
+       → excepciones / conciliación / auditoría / export
                  ↑
               packages/core
 ```
@@ -32,18 +35,20 @@ desktop  →  ingest-vision-result → postproceso LLM (opcional)
 | `IFileSystem` | cada app | Nano exige `attachments[].path` en disco |
 | `IReceiptStore` | desktop (registro); móvil puede cachear | SQLite / JSON local |
 | `IReportExporter` | `apps/desktop/.../exporters/{pdf,csv,xlsx,json}` | solo escritorio |
+| `IAuditLog` | desktop persistencia | eventos `audit-event` |
 | `IClock` | ambas | reloj de sistema |
 
-El dominio habla de *hechos de un recibo*, *excepciones* y *liquidar un viaje*, no de `projectionModelSrc` ni de «el modelo dijo que procede».
+El dominio habla de *hechos de un recibo*, *motivo*, *excepciones* y *liquidar un viaje*, no de `projectionModelSrc` ni de «el modelo dijo que procede». `ILanguageModel` sirve al postproceso **y** a `classify-motive`; nunca escribe `contracts/verdict`.
 
 ## Flujo de un comprobante
 
 1. El usuario dispara en Android. El adaptador de cámara deja un archivo en disco.
 2. `analyze-receipt` llama `IVisionInference` (una imagen; Base si el ticket es denso). Sale un DTO de `packages/contracts/vision-result` (schema + confianza + RAW).
 3. `pair-devices` ya emparejó. `IJobTransport` entrega un `analysis-job`.
-4. Electron **inbox** persiste con `ingest-vision-result`. El postproceso (`analyze-with-llm`) es lingüístico; el validador de dígitos puede descartarlo.
-5. `validate-policy` (viaje, duplicados, topes, confianza) emite el veredicto.
-6. El renderer muestra el **centro de excepciones** y la liquidación. `export-report` sale por `IReportExporter`.
+4. Electron persiste con `ingest-vision-result`. El postproceso (`analyze-with-llm`) es lingüístico; el validador de dígitos puede descartarlo.
+5. Si hay texto de motivo, `classify-motive` produce categoría + confianza (sin veredicto).
+6. `validate-policy` + `detect-duplicates` + confianza emiten `verdict`. `record-audit` deja el rastro.
+7. UI: **centro de excepciones**, conciliación, auditoría. `export-report` por `IReportExporter`.
 
 Delegated inference (`loadModel({ delegate })`) es un **extra**. El expediente y el veredicto viven en desktop + core.
 
@@ -53,14 +58,14 @@ Delegated inference (`loadModel({ delegate })`) es un **extra**. El expediente y
 | --- | --- |
 | `src/main` | Composition + Qwen + persistencia + exporters + provider |
 | `src/preload` | `contextBridge` estrecho |
-| `src/renderer` | Excepciones, viaje, liquidación, export |
+| `src/renderer` | Excepciones, viaje, liquidación, auditoría, export |
 | `src/adapters/driving/ipc` | `ipcMain` → casos de uso |
 
 QVAC no entra al renderer. La UI no es un log de tokens.
 
 ## Móvil es captura, no liquidación
 
-Pantallas Expo Router (`apps/mobile/app/{capture,preview,pairing}`): foto, preview del DTO, envío. Sin PDF ni política pesada en el teléfono.
+Pantallas Expo Router (`apps/mobile/app/{capture,motive,preview,pairing}`): foto, motivo libre, preview del DTO, envío. Sin PDF ni política pesada en el teléfono.
 
 ## Arquitectura de referencia
 
@@ -69,6 +74,6 @@ Pantallas Expo Router (`apps/mobile/app/{capture,preview,pairing}`): foto, previ
 
 ## Límites
 
-- Un bounded context de hackathon: **liquidación de viáticos** (etapa 1).
-- VisionPsy solo en móvil; Instruct solo en desktop; autoridad solo en core.
+- Un bounded context **implementado**: liquidación de viáticos (cuña). La tesis (excepciones documentales financieras, etapas 2–3) no tiene paquetes.
+- VisionPsy solo en móvil; Instruct (postproceso + `classify-motive`) solo en desktop; `verdict` solo en core.
 - Un recibo = una imagen (límite de VisionPsy).
