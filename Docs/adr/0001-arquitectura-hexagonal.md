@@ -6,14 +6,13 @@ Aceptada.
 
 ## Contexto
 
-ViáticoCero combina un dominio de gastos con un runtime nativo (Electron + worker Bare + addons QVAC) y una UI React. Esos tres mundos cambian a ritmos distintos.
+ViáticoCero combina un dominio de gastos con **dos** runtimes nativos (Expo/BareKit en Android, Electron/Bare en desktop) y dos UIs (RN vs React DOM). Esos mundos cambian a ritmos distintos.
 
 ## Decisión
 
-Puertos y adaptadores. El dominio y los casos de uso no importan frameworks ni `@qvac/sdk`.
+Puertos y adaptadores. `packages/core` no importa frameworks ni `@qvac/sdk`. Los adaptadores viven en cada app.
 
 ## Consecuencias
 
-- Añadir Bare in-process o un futuro móvil es un adaptador nuevo.
-- Más carpetas al inicio; menos reescritura cuando QVAC cambie el worker.
-- Tests de política/liquidación sin GPU ni GGUF.
+- Añadir un target es un paquete de app, no un rewrite del dominio.
+- Tests de política/liquidación sin GPU ni GGUF (`tests/unit`).
