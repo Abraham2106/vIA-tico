@@ -15,4 +15,5 @@ Puertos y adaptadores. `packages/core` no importa frameworks ni `@qvac/sdk`. Los
 ## Consecuencias
 
 - Añadir un target es un paquete de app, no un rewrite del dominio.
-- Tests de política/liquidación sin GPU ni GGUF (`tests/unit`).
+- Tests de política, duplicados y excepciones sin GPU ni GGUF (`tests/unit`).
+- El modelo no vive en `packages/core`; el veredicto sí (ADR 0010).

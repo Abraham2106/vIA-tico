@@ -14,8 +14,8 @@ Dos caminos. **El de producto no es el delegate.**
 
 ```
 VisionPsy local (móvil) → contracts/vision-result → analysis-job
-    → inbox Electron → ingest-vision-result → ILanguageModel local
-    → UI desktop → IReportExporter
+    → inbox Electron → ingest-vision-result → postproceso ILanguageModel (opcional)
+    → validate-policy en core → centro de excepciones / liquidación / export
 ```
 
 Puerto: `IJobTransport`. El desktop **muestra, guarda y exporta**. ADR 0008.
