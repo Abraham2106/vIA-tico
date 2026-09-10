@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@viaticocero/contracts": ["../../packages/contracts/index.ts"],
+      "@viaticocero/core": ["../../packages/core/index.ts"]
+    }
+  },
+  "include": [
+    "src/renderer/**/*.ts",
+    "src/renderer/**/*.tsx",
+    "src/composition/**/*.ts",
+    "src/adapters/**/*.ts",
+    "vite.config.ts"
+  ]
+}
