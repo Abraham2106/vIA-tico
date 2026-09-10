@@ -2,7 +2,7 @@
 
 Índice del approach actual. El texto que describía «app de escritorio que lee un recibo y exporta» quedó sustituido por producto + autoridad + demo (00, 07, 08, ADRs 0010–0012). El hexágono, el monorepo y el pin QVAC 0.18.2 **se mantienen**.
 
-**No hay código de aplicación todavía**: carpetas + `.gitkeep` y estas decisiones.
+El hexágono, los contratos y las apps (sin motor QVAC) ya están en el árbol. Los ADRs siguen mandando.
 
 | Documento | Qué responde |
 | --- | --- |

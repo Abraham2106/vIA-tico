@@ -6,7 +6,7 @@ Sistema *local-first* de liquidación de viáticos. VisionPsy Nano comprende el 
 
 No es «una IA que lee facturas». No es «una IA que reemplaza al contador». Si el modelo se vuelve loco, la arquitectura limita el daño: **nunca autoriza un pago**.
 
-Este repositorio, ahora mismo, es **scaffold**: carpetas hexagonales (`.gitkeep`) y la justificación en [`Docs/`](./Docs/README.md). No hay `package.json` todavía.
+Este repositorio ya tiene el **producto no-QVAC**: workspaces, contratos, motor de reglas, centro de excepciones, liquidación, export e inbox DTO. VisionPsy / Qwen / Hyperswarm quedan como **puertos** (`IVisionInference`, `ILanguageModel`, `IQvacProvider`) sin cablear el SDK. Justificación en [`Docs/`](./Docs/README.md).
 
 ## Por qué QVAC tiene que estar
 
@@ -39,6 +39,19 @@ Detalle: [`Docs/00-producto.md`](./Docs/00-producto.md) · [`Docs/08-demo-evals.
 - Móvil: Expo ≥ 54 + VisionPsy Nano (local). **No Flutter** (ADR 0009)
 - Escritorio: electron-vite + Qwen3-4B-Instruct (local, postproceso lingüístico) + Bare
 - Autoridad: código (schema, dígitos, duplicados, fechas del viaje, política)
+
+## Cómo correr (sin modelos)
+
+```bash
+npm install
+npm test
+npm run typecheck
+npm run desktop:web   # centro de excepciones en Vite (localhost:5173)
+```
+
+Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy no está cableado.
+
+El escritorio siembra el viaje demo Liberia 10–14 sep (6 PROCEDE + 2 REVISIÓN).
 
 ## Cómo se trabaja
 

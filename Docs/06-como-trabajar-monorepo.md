@@ -11,7 +11,7 @@ ViáticoCero es **un repo, dos apps, un hexágono**. Las reglas cortas para huma
    - Cámara o VisionPsy → `apps/mobile` (Expo/RN, **no Flutter**)
    - Centro de excepciones, liquidación, PDF/Excel → `apps/desktop`
 3. Un PR puede tocar varios paquetes si el DTO o un caso de uso cruza dispositivos.
-4. Todavía no hay `package.json`: este árbol es scaffold. El primer PR de código declara workspaces (npm o pnpm) **sin** fusionar Expo y Electron en un solo manifiesto.
+4. Workspaces npm en la raíz (`packages/*` + `apps/*`). Expo y Electron **no** comparten un solo manifiesto de app; cada una tiene el suyo. `.npmrc` usa `install-strategy=nested` para no pelear React DOM vs React Native.
 
 ## Skills en este repo
 
