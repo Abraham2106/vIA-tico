@@ -6,14 +6,14 @@ Aceptada (enmendada: la app vive en `apps/desktop`).
 
 ## Contexto
 
-QVAC documenta electron-vite `react-ts` + QVAC en main + Forge. El escritorio no es un provider headless: el usuario ve resultados y exporta.
+QVAC documenta electron-vite `react-ts` + QVAC en main + Forge. El escritorio no es un provider headless: el usuario ve **excepciones**, liquida y exporta.
 
 ## Decisión
 
 - Paquete `apps/desktop` con `src/main`, `src/preload`, `src/renderer` (tutorial, `cwd` = esa app).
-- UI = React (inbox, detalle, guardar, formatos).
+- UI = React (centro de excepciones, viaje, liquidación, formatos).
 - Build = electron-vite; package = Forge + `QvacForgePlugin`; `dist/main|preload|renderer`.
-- Main hospeda el LLM pesado, persistencia, exporters y `startQVACProvider`.
+- Main hospeda Qwen Instruct, persistencia, exporters y `startQVACProvider` opcional. El veredicto no sale de main: sale de `packages/core`.
 
 ## Consecuencias
 

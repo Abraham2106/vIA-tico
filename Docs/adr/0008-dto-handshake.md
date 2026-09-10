@@ -6,16 +6,16 @@ Aceptada.
 
 ## Contexto
 
-QVAC permite `loadModel({ delegate })` para que el teléfono use el LLM del PC por Hyperswarm. Eso entrega tokens al celular, no un expediente en la UI de Electron (guardar, PDF, etc.).
+QVAC permite `loadModel({ delegate })` para que el teléfono use el Instruct del PC por Hyperswarm. Eso entrega tokens al celular, no un expediente con veredicto en Electron.
 
 ## Decisión
 
 El camino de producto es:
 
-1. VisionPsy local → `packages/contracts/vision-result`
+1. VisionPsy local → `packages/contracts/vision-result` (schema + confianza + RAW)
 2. Envío como `analysis-job`
-3. Inbox desktop → `ingest-vision-result` → `analyze-with-llm` local
-4. UI y `IReportExporter`
+3. Inbox desktop → `ingest-vision-result` → postproceso opcional → **`validate-policy` en core**
+4. Centro de excepciones, liquidación, `IReportExporter`
 
 `IQvacProvider` / delegated inference queda **opcional** (el celular pide una inferencia al LLM sin pasar por la pantalla de export).
 

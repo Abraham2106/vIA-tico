@@ -3,12 +3,12 @@ name: electron-qvac
 description: >
   App Electron de ViáticoCero: electron-vite, main/preload/renderer, QVAC en
   main, inbox, exporters, Forge, asar false. Úsala al editar apps/desktop,
-  IPC, React del renderer, empaquetado o el LLM pesado de escritorio.
+  IPC, React del renderer, empaquetado, excepciones o Qwen Instruct en escritorio.
 ---
 
 # Electron (apps/desktop) — app de producto
 
-No es un daemon. El usuario **ve** el análisis, **guarda** y **convierte** formatos.
+No es un daemon ni un chat del LLM. El usuario **ve excepciones**, **liquida** y **exporta**. El veredicto sale de `packages/core`.
 
 ## Layout (tutorial QVAC, cwd = esta app)
 
@@ -18,7 +18,7 @@ apps/desktop/src/preload
 apps/desktop/src/renderer/src   # React + Vite — SIN @qvac/sdk
 ```
 
-Features UI: `inbox`, `receipts`, `trips`, `settlements`, `export`.
+Features UI: `exceptions` (primaria), `inbox`, `receipts`, `trips`, `settlements`, `export`.
 
 ## Proceso main
 

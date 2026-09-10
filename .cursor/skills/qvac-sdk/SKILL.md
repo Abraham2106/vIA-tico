@@ -23,7 +23,7 @@ El adaptador llama al SDK **directo**. Sin fachada “por si acaso”. Un bump d
 
 ## Plugin
 
-Ambos modelos (VisionPsy y LLM pesado) usan llama.cpp:
+Ambos modelos (VisionPsy y Qwen Instruct) usan llama.cpp:
 
 ```json
 { "plugins": ["@qvac/sdk/llamacpp-completion/plugin"] }
@@ -35,11 +35,11 @@ Bare in-process: registrar `llmPlugin` **antes** de la primera llamada (`plugins
 
 ## Modelos en este producto
 
-- **Móvil:** VisionPsy Nano, una imagen, path en disco (`attachments[].path`).
-  - Flash (default): `VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` + `MMPROJ_VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` + `image_no_upscale: 'on'`.
-  - Base: constantes con sufijo `_1`, **sin** el flag.
+- **Móvil:** VisionPsy Nano, una imagen, path en disco (`attachments[].path`). Document understanding / OCR on-device (Tether).
+  - Tickets densos: **Base** (`*_1`, **sin** `image_no_upscale`).
+  - Latencia / RAM justa: **Flash** + `VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` + mmproj homónimo + `image_no_upscale: 'on'`.
   - Mezclar flag y par degrada calidad y pasa validación: no lo hagas.
-- **Desktop:** LLM pesado vía el mismo plugin. Constantes concretas en el adaptador `qvac-llm`, no en el dominio.
+- **Desktop:** `QWEN3_4B_INST_Q4_K_M` (Instruct). **No** `QWEN3_4B_Q4_K_M` (difusión). El adaptador `qvac-llm` nombra la constante; el dominio no. El modelo no emite `PROCEDE`.
 
 Detalle de pares: `Docs/04-qvac-visionpsy-bare.md`.
 

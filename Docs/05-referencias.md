@@ -31,7 +31,7 @@ Fuentes oficiales de QVAC y tutoriales Tether.
 | Origen | ViáticoCero |
 | --- | --- |
 | Electron `src/main` | `apps/desktop/src/main` + `composition/electron` + `qvac-llm` |
-| Electron `src/renderer` | `apps/desktop/src/renderer` (inbox, export) |
+| Electron `src/renderer` | `apps/desktop/src/renderer` (excepciones, liquidación, export) |
 | Electron `qvac/` | `apps/desktop/qvac/` |
 | Expo `app.json` plugins | `apps/mobile` (manifiesto aún no creado) |
 | Expo pantallas | `apps/mobile/app/{capture,preview,pairing}` |
@@ -40,6 +40,8 @@ Fuentes oficiales de QVAC y tutoriales Tether.
 | Dominio | `packages/core` |
 
 ## VisionPsy (producto)
+
+Tether lo anuncia como líder de su clase ~0.5B en **document understanding and OCR** (y en las otras tres categorías que midieron). ViáticoCero lo usa para eso, en el teléfono. El motor de reglas no es una disculpa del Psy: es la tapa de autoridad sobre dinero.
 
 - [Blog VisionPsy-Nano](https://qvac.tether.io/blog/visionpsy-nano-state-of-the-art-vision-ai-in-its-weight-class-small-enough-to-run-on-your-phone/)
 - [Models — QVAC VisionPsy](https://qvac.tether.io/models/)
