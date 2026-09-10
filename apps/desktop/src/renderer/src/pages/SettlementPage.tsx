@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
-import { formatMoney, type Settlement, type WorkspaceSnapshot } from '@viaticocero/core'
+import {
+  InlineNotification,
+  StructuredListBody,
+  StructuredListCell,
+  StructuredListHead,
+  StructuredListRow,
+  StructuredListWrapper,
+} from '@carbon/react'
+import { formatMoney, type WorkspaceSnapshot } from '@viaticocero/core'
+import { formatDisplayDate } from '@viaticocero/ui-tokens'
+import { AppEmptyState } from '../components/AppEmptyState'
+import { PageScaffold } from '../components/PageScaffold'
 import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
 
 type Props = {
@@ -11,7 +22,7 @@ type Props = {
 
 export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) {
   const trip = snapshot.trips.find((item) => item.id === focusTripId) ?? snapshot.trips[0]
-  const [settlement, setSettlement] = useState<Settlement | null>(null)
+  const [settlement, setSettlement] = useState<Awaited<ReturnType<DesktopApi['settleTrip']>> | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -19,7 +30,16 @@ export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) 
     void api.settleTrip(trip.id).then(setSettlement)
   }, [api, trip])
 
-  if (!trip) return <div className="card empty">No hay viajes.</div>
+  if (!trip) {
+    return (
+      <PageScaffold title="Liquidación">
+        <AppEmptyState
+          title="No hay viajes"
+          subtitle="Registra un viaje para liquidar adelanto contra comprobantes."
+        />
+      </PageScaffold>
+    )
+  }
 
   async function close() {
     if (!trip) return
@@ -34,49 +54,54 @@ export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) 
   }
 
   return (
-    <div>
-      <div className="page-head">
-        <div>
-          <h1>Liquidación</h1>
-          <p>
-            Aritmética de dominio: adelanto vs respaldado vs aprobado. El modelo no suma.
-          </p>
-        </div>
-        <button className="btn" onClick={() => void close()}>
-          Cerrar viaje
-        </button>
-      </div>
-      {error ? <div className="card" style={{ marginBottom: 12, color: '#ffd0d0' }}>{error}</div> : null}
-      {settlement ? (
-        <div className="grid stats">
-          <Box k="Adelanto" v={formatMoney(settlement.advance)} />
-          <Box k="Respaldado" v={formatMoney(settlement.backedTotal)} />
-          <Box k="Aprobado" v={formatMoney(settlement.approvedTotal)} />
-          <Box k="En revisión" v={formatMoney(settlement.pendingReviewTotal)} />
-          <Box k="No procede" v={formatMoney(settlement.rejectedTotal)} />
-          <Box k="A devolver" v={formatMoney(settlement.toReturn)} />
-          <Box k="A reembolsar" v={formatMoney(settlement.toReimburse)} />
-          <Box k="Excepciones abiertas" v={String(settlement.openExceptionCount)} />
-        </div>
+    <PageScaffold
+      title="Liquidación"
+      subtitle={`${trip.destination} · ${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)}`}
+      pageActions={[{ kind: 'secondary', label: 'Cerrar viaje', onClick: () => void close() }]}
+    >
+      {error ? (
+        <InlineNotification
+          kind="error"
+          title="No se pudo cerrar el viaje"
+          subtitle={error}
+          lowContrast
+          hideCloseButton
+        />
       ) : null}
-      <div className="card">
-        <p>
-          {trip.destination} · {trip.startDate} – {trip.endDate} · {trip.status}
+      {settlement ? (
+        <StructuredListWrapper ariaLabel="Resumen de liquidación">
+          <StructuredListHead>
+            <StructuredListRow head>
+              <StructuredListCell head>Concepto</StructuredListCell>
+              <StructuredListCell head>Monto</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListHead>
+          <StructuredListBody>
+            <Row k="Adelanto" v={formatMoney(settlement.advance)} />
+            <Row k="Respaldado" v={formatMoney(settlement.backedTotal)} />
+            <Row k="Aprobado" v={formatMoney(settlement.approvedTotal)} />
+            <Row k="En revisión" v={formatMoney(settlement.pendingReviewTotal)} />
+            <Row k="No procede" v={formatMoney(settlement.rejectedTotal)} />
+            <Row k="A devolver" v={formatMoney(settlement.toReturn)} />
+            <Row k="A reembolsar" v={formatMoney(settlement.toReimburse)} />
+          </StructuredListBody>
+        </StructuredListWrapper>
+      ) : null}
+      {settlement ? (
+        <p className="cds--label-01" style={{ marginTop: '1rem' }}>
+          {settlement.procedeCount} PROCEDE · {settlement.revisionCount} REVISIÓN · {settlement.noProcedeCount} NO
+          PROCEDE · {settlement.openExceptionCount} excepciones abiertas
         </p>
-        <p className="muted">
-          {settlement?.procedeCount} PROCEDE · {settlement?.revisionCount} REVISIÓN ·{' '}
-          {settlement?.noProcedeCount} NO PROCEDE
-        </p>
-      </div>
-    </div>
+      ) : null}
+    </PageScaffold>
   )
 }
 
-function Box({ k, v }: { k: string; v: string }) {
+function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="card stat">
-      <div className="k">{k}</div>
-      <div className="v">{v}</div>
-    </div>
+    <StructuredListRow>
+      <StructuredListCell>{k}</StructuredListCell>
+      <StructuredListCell className="vz-num">{v}</StructuredListCell>
+    </StructuredListRow>
   )
 }

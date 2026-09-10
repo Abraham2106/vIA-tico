@@ -30,6 +30,7 @@ Features UI: `exceptions` (primaria), `audit`, `inbox`, `receipts`, `trips`, `se
 ## Renderer
 
 - Solo UI. Habla por preload/`contextBridge` (superficie estrecha, `renderer-bridge`).
+- Tokens: `@viaticocero/ui-tokens` + `styles/global.css`. No reintroducir teal ni IBM Plex (ADR 0014).
 - Strict Mode: el tutorial QVAC lo quita para no doble-cargar modelos en `useEffect`. Respeta eso cuando wires `loadModel`.
 
 ## Empaquetado

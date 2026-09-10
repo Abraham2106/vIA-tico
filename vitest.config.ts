@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@viaticocero/contracts': `${root}/packages/contracts/index.ts`,
       '@viaticocero/core': `${root}/packages/core/index.ts`,
+      '@viaticocero/ui-tokens': `${root}/packages/ui-tokens/index.ts`,
     },
   },
   test: {

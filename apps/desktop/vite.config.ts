@@ -8,10 +8,24 @@ export default defineConfig({
   root: fileURLToPath(new URL('./src/renderer', import.meta.url)),
   plugins: [react()],
   resolve: {
-    alias: {
-      '@viaticocero/contracts': `${workspace}/packages/contracts/index.ts`,
-      '@viaticocero/core': `${workspace}/packages/core/index.ts`,
-    },
+    alias: [
+      {
+        find: '@viaticocero/ui-tokens/tokens.css',
+        replacement: `${workspace}/packages/ui-tokens/tokens.css`,
+      },
+      {
+        find: '@viaticocero/ui-tokens',
+        replacement: `${workspace}/packages/ui-tokens/index.ts`,
+      },
+      {
+        find: '@viaticocero/contracts',
+        replacement: `${workspace}/packages/contracts/index.ts`,
+      },
+      {
+        find: '@viaticocero/core',
+        replacement: `${workspace}/packages/core/index.ts`,
+      },
+    ],
   },
   server: {
     host: '127.0.0.1',

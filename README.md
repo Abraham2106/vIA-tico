@@ -35,7 +35,7 @@ Detalle: [`Docs/00-producto.md`](./Docs/00-producto.md) (tesis + cuña, 18 punto
 | `apps/mobile` | Android (**Expo / React Native**, no Flutter) | Cámara + motivo libre + **VisionPsy Nano** + DTO |
 | `apps/desktop` | Electron | **Centro de excepciones**, conciliación, auditoría, política, export, Qwen Instruct |
 
-`packages/core` no conoce Expo, Electron ni `@qvac/sdk`. Ahí vive la autoridad (`PROCEDE | REVISIÓN | NO PROCEDE`). `packages/contracts` es el handshake teléfono ↔ escritorio.
+`packages/core` no conoce Expo, Electron ni `@qvac/sdk`. Ahí vive la autoridad (`PROCEDE | REVISIÓN | NO PROCEDE`). `packages/contracts` es el handshake teléfono ↔ escritorio. Desktop usa Carbon / IBM Products; `packages/ui-tokens` cubre fechas, categorías y color del móvil (no componentes React).
 
 ## Stack (fijo)
 
@@ -64,6 +64,7 @@ Un clone. Cambias el paquete que toca. Skills: `.cursor/skills/` y `apps/*/.curs
 ```
 packages/core         hexágono (excepciones, veredicto, auditoría; hoy: viaje)
 packages/contracts    visión + motivo + veredicto + audit
+packages/ui-tokens    fechas/categorías; color para móvil (ADR 0014)
 apps/desktop          centro de excepciones + conciliación + auditoría
 apps/mobile           captura + motivo + VisionPsy
 Docs/                 tesis (00) y ADRs

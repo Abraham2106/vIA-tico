@@ -3,8 +3,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Link } from 'expo-router'
 import { ensureDemoTrip, getMobileWorkspace } from '../src/composition/expo'
 import { DEMO_TRIP } from '@viaticocero/core'
+import { formatDisplayDate } from '@viaticocero/ui-tokens'
+import { useAppTheme } from '../src/theme'
 
 export default function HomeScreen() {
+  const theme = useAppTheme()
   const [visionStatus, setVisionStatus] = useState('…')
 
   useEffect(() => {
@@ -12,29 +15,35 @@ export default function HomeScreen() {
     setVisionStatus(getMobileWorkspace().deps.vision.status())
   }, [])
 
+  const styles = makeStyles(theme)
+
   return (
     <View style={styles.wrap}>
-      <Text style={styles.kicker}>Captura · no liquida</Text>
+      <Text style={styles.kicker}>Capturar</Text>
       <Text style={styles.title}>Viaje {DEMO_TRIP.destination}</Text>
       <Text style={styles.meta}>
-        {DEMO_TRIP.startDate} – {DEMO_TRIP.endDate}
+        {formatDisplayDate(DEMO_TRIP.startDate)} – {formatDisplayDate(DEMO_TRIP.endDate)}
       </Text>
       <Text style={styles.copy}>
-        Foto o DTO manual → preview → analysis-job al escritorio. VisionPsy está como puerto (
-        {visionStatus}).
+        Foto o DTO manual → revisión → analysis-job al escritorio. VisionPsy está como puerto (
+        {visionStatus}). El celular no liquida.
       </Text>
       <Link href="/capture" asChild>
-        <Pressable style={styles.primary}>
+        <Pressable
+          style={styles.primary}
+          accessibilityRole="button"
+          accessibilityLabel="Capturar comprobante"
+        >
           <Text style={styles.primaryText}>Capturar comprobante</Text>
         </Pressable>
       </Link>
       <Link href="/preview" asChild>
-        <Pressable style={styles.secondary}>
+        <Pressable style={styles.secondary} accessibilityRole="button" accessibilityLabel="Ver preview y enviar">
           <Text style={styles.secondaryText}>Ver preview / enviar</Text>
         </Pressable>
       </Link>
       <Link href="/pairing" asChild>
-        <Pressable style={styles.secondary}>
+        <Pressable style={styles.secondary} accessibilityRole="button" accessibilityLabel="Emparejar escritorio">
           <Text style={styles.secondaryText}>Emparejar escritorio</Text>
         </Pressable>
       </Link>
@@ -42,14 +51,40 @@ export default function HomeScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  wrap: { flex: 1, padding: 20, gap: 12, justifyContent: 'center' },
-  kicker: { color: '#93a0ae', textTransform: 'uppercase', letterSpacing: 1 },
-  title: { color: '#e8eef4', fontSize: 28, fontWeight: '700' },
-  meta: { color: '#5ec4b6', fontFamily: 'monospace' },
-  copy: { color: '#93a0ae', lineHeight: 20, marginBottom: 8 },
-  primary: { backgroundColor: '#3d9b8f', borderRadius: 12, padding: 14 },
-  primaryText: { color: '#06221e', fontWeight: '700', textAlign: 'center' },
-  secondary: { borderColor: '#2a3542', borderWidth: 1, borderRadius: 12, padding: 14 },
-  secondaryText: { color: '#e8eef4', textAlign: 'center' },
-})
+function makeStyles(theme: ReturnType<typeof useAppTheme>) {
+  return StyleSheet.create({
+    wrap: { flex: 1, padding: theme.space[4], gap: theme.space[3], justifyContent: 'center' },
+    kicker: {
+      color: theme.colors.muted,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      fontSize: 11,
+      fontWeight: '500',
+    },
+    title: { color: theme.colors.text, fontSize: 22, lineHeight: 28, fontWeight: '600' },
+    meta: {
+      color: theme.colors.brand,
+      fontVariant: ['tabular-nums'],
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    copy: { color: theme.colors.muted, lineHeight: 20, fontSize: 14, marginBottom: 8 },
+    primary: {
+      backgroundColor: theme.colors.interactive,
+      borderRadius: theme.radius.md,
+      padding: 14,
+      minHeight: 48,
+      justifyContent: 'center',
+    },
+    primaryText: { color: '#FFFFFF', fontWeight: '600', textAlign: 'center', fontSize: 14 },
+    secondary: {
+      borderColor: theme.colors.border,
+      borderWidth: 1,
+      borderRadius: theme.radius.md,
+      padding: 14,
+      minHeight: 48,
+      justifyContent: 'center',
+    },
+    secondaryText: { color: theme.colors.text, textAlign: 'center', fontSize: 14, fontWeight: '500' },
+  })
+}

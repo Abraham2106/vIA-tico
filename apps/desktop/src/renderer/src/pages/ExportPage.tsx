@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Button, Checkbox, Select, SelectItem, Stack } from '@carbon/react'
 import type { ExportFormat } from '@viaticocero/contracts'
 import type { WorkspaceSnapshot } from '@viaticocero/core'
+import { PageScaffold } from '../components/PageScaffold'
 import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
 
 type Props = {
@@ -9,7 +11,7 @@ type Props = {
 }
 
 function download(filename: string, mime: string, body: string | Uint8Array) {
-  const part = typeof body === 'string' ? body : body.buffer as ArrayBuffer
+  const part = typeof body === 'string' ? body : (body.buffer as ArrayBuffer)
   const blob = new Blob([part], { type: mime })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -31,51 +33,33 @@ export function ExportPage({ snapshot, api }: Props) {
   }
 
   return (
-    <div>
-      <div className="page-head">
-        <div>
-          <h1>Exportar</h1>
-          <p>PDF, CSV, XLSX y JSON locales. Sin ERP ni nube.</p>
-        </div>
-      </div>
-      <div className="card" style={{ maxWidth: 560 }}>
-        <label>
-          Viaje
-          <select value={tripId} onChange={(event) => setTripId(event.target.value)}>
-            {snapshot.trips.map((trip) => (
-              <option key={trip.id} value={trip.id}>
-                {trip.destination} ({trip.startDate})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label style={{ marginTop: 12 }}>
-          <span className="row">
-            <input
-              type="checkbox"
-              checked={includeRaw}
-              onChange={(event) => setIncludeRaw(event.target.checked)}
-              style={{ width: 'auto' }}
-            />
-            Incluir RAW de visión
-          </span>
-        </label>
-        <div className="row" style={{ marginTop: 16 }}>
-          <button className="btn primary" onClick={() => void run('json')}>
-            JSON
-          </button>
-          <button className="btn" onClick={() => void run('csv')}>
+    <PageScaffold title="Exportar" subtitle="PDF, CSV, XLSX y JSON locales. Sin ERP ni nube.">
+      <Stack gap={5} style={{ maxWidth: '32rem' }}>
+        <Select id="export-trip" labelText="Viaje" value={tripId} onChange={(event) => setTripId(event.target.value)}>
+          {snapshot.trips.map((trip) => (
+            <SelectItem key={trip.id} value={trip.id} text={`${trip.destination} (${trip.startDate})`} />
+          ))}
+        </Select>
+        <Checkbox
+          id="include-raw"
+          labelText="Incluir RAW de visión"
+          checked={includeRaw}
+          onChange={(_, { checked }) => setIncludeRaw(checked)}
+        />
+        <Stack gap={3} orientation="horizontal">
+          <Button onClick={() => void run('json')}>JSON</Button>
+          <Button kind="secondary" onClick={() => void run('csv')}>
             CSV
-          </button>
-          <button className="btn" onClick={() => void run('xlsx')}>
+          </Button>
+          <Button kind="secondary" onClick={() => void run('xlsx')}>
             Excel
-          </button>
-          <button className="btn" onClick={() => void run('pdf')}>
+          </Button>
+          <Button kind="tertiary" onClick={() => void run('pdf')}>
             PDF
-          </button>
-        </div>
-        {message ? <p className="muted">{message}</p> : null}
-      </div>
-    </div>
+          </Button>
+        </Stack>
+        {message ? <p className="cds--label-01">{message}</p> : null}
+      </Stack>
+    </PageScaffold>
   )
 }

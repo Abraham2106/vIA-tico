@@ -1,11 +1,16 @@
+import { Tag } from '@carbon/react'
 import { labelForVerdict, type Verdict } from '@viaticocero/core'
 
+const TYPE: Record<Verdict, 'green' | 'warm-gray' | 'red'> = {
+  PROCEDE: 'green',
+  REVISION: 'warm-gray',
+  NO_PROCEDE: 'red',
+}
+
 export function VerdictPill({ verdict }: { verdict: Verdict }) {
-  const cls = verdict === 'PROCEDE' ? 'ok' : verdict === 'REVISION' ? 'warn' : 'danger'
-  const mark = verdict === 'PROCEDE' ? '✓' : verdict === 'REVISION' ? '⚠' : '✕'
   return (
-    <span className={`pill ${cls}`}>
-      {mark} {labelForVerdict(verdict)}
-    </span>
+    <Tag type={TYPE[verdict]} size="sm" title={labelForVerdict(verdict)}>
+      {labelForVerdict(verdict)}
+    </Tag>
   )
 }
