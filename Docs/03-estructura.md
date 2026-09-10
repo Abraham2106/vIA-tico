@@ -1,92 +1,86 @@
 # Estructura de carpetas
 
-Solo carpetas versionadas con `.gitkeep`. Los archivos de implementación (`package.json`, `*.ts`, `qvac.config.json`) se añaden en un PR posterior.
+Solo carpetas con `.gitkeep`. `package.json`, workspaces npm/pnpm, `app.json` y `qvac.config.json` van en un PR de implementación.
 
 ```
 vIA-tico/
-├── Docs/                          # Este justificante (sí hay Markdown)
-├── config/qvac/                   # Futuro qvac.config.json (JSON: Node + Bare + Expo)
-├── qvac/                          # Salida de bundle: worker.bundle.js (Bare, asar:false)
-├── resources/
-│   ├── icons/
-│   ├── models/                    # Caché local de GGUF (no commitear pesos)
-│   └── samples/receipts/          # Fixtures de imagen para tests
-├── src/
-│   ├── core/                      # HEXÁGONO — prohibido importar Electron/QVAC/React
-│   │   ├── domain/
-│   │   │   ├── traveler/
-│   │   │   ├── trip/
-│   │   │   ├── receipt/
-│   │   │   ├── policy/
-│   │   │   ├── settlement/
-│   │   │   └── shared/
+├── Docs/
+├── packages/
+│   ├── core/                              # HEXÁGONO — prohibido Expo/Electron/QVAC
+│   │   ├── domain/{traveler,trip,receipt,policy,settlement,shared}/
 │   │   └── application/
-│   │       ├── ports/
-│   │       │   ├── inbound/       # Casos de uso como interfaz (driving)
-│   │       │   └── outbound/      # IVisionInference, IFileSystem, IReceiptStore…
+│   │       ├── ports/{inbound,outbound}/
 │   │       └── use-cases/
 │   │           ├── register-trip/
 │   │           ├── attach-receipt/
-│   │           ├── analyze-receipt/
+│   │           ├── analyze-receipt/       # visión (se ejecuta en móvil)
+│   │           ├── ingest-vision-result/  # desktop recibe el DTO
+│   │           ├── analyze-with-llm/      # LLM pesado (desktop)
 │   │           ├── validate-policy/
 │   │           ├── settle-trip/
-│   │           └── export-report/
-│   ├── adapters/
-│   │   ├── driven/                # Infraestructura
-│   │   │   ├── qvac-visionpsy/    # @qvac/sdk 0.18.2 + constantes VisionPsy
-│   │   │   ├── qvac-bare/         # @qvac/inference + plugins([...])
-│   │   │   ├── filesystem/
-│   │   │   ├── persistence/
-│   │   │   └── clock/
-│   │   └── driving/
-│   │       ├── ipc/               # ipcMain.handle → casos de uso
-│   │       └── renderer-bridge/   # tipos del API expuesto al renderer
-│   ├── composition/
-│   │   ├── electron/              # registerPlatform() para escritorio
-│   │   └── bare/                  # process global + registro de llmPlugin
-│   ├── main/                      # electron-vite — composition root
-│   ├── preload/                   # contextBridge
-│   └── renderer/src/              # React + Vite (solo UI)
-│       ├── assets/
-│       ├── components/
-│       ├── features/{receipts,trips,settlements}/
-│       ├── hooks/
-│       ├── pages/
-│       └── styles/
-└── tests/
-    ├── unit/{domain,application}/
-    ├── integration/qvac/
-    └── e2e/
+│   │           ├── export-report/
+│   │           └── pair-devices/
+│   └── contracts/                         # handshake; ambas apps pueden importar
+│       ├── vision-result/
+│       ├── analysis-job/
+│       ├── pairing/
+│       └── export-formats/
+├── apps/
+│   ├── desktop/                           # APP Electron (UI + LLM + export)
+│   │   ├── src/
+│   │   │   ├── main/                      # electron-vite (relativo a esta app)
+│   │   │   ├── preload/
+│   │   │   ├── renderer/src/
+│   │   │   │   ├── features/{inbox,receipts,trips,settlements,export}/
+│   │   │   │   └── {assets,components,hooks,pages,styles}/
+│   │   │   ├── adapters/
+│   │   │   │   ├── driven/
+│   │   │   │   │   ├── qvac-llm/
+│   │   │   │   │   ├── qvac-provider/
+│   │   │   │   │   ├── exporters/{pdf,csv,xlsx,json}/
+│   │   │   │   │   └── {filesystem,persistence,clock}/
+│   │   │   │   └── driving/{ipc,renderer-bridge}/
+│   │   │   └── composition/{electron,bare}/
+│   │   ├── config/qvac/
+│   │   ├── qvac/                          # worker.bundle.js de ESTA app
+│   │   ├── resources/{icons,models}/
+│   │   └── tests/{e2e,integration/qvac}/
+│   └── mobile/                            # APP Expo Android
+│       ├── app/{capture,preview,pairing}/ # Expo Router
+│       ├── src/
+│       │   ├── adapters/
+│       │   │   ├── driven/{qvac-visionpsy,camera,filesystem}/
+│       │   │   └── driving/screens/
+│       │   └── composition/expo/
+│       ├── config/qvac/
+│       ├── qvac/
+│       ├── resources/samples/receipts/
+│       └── tests/{e2e,integration/qvac}/
+└── tests/unit/{domain,application}/       # hexágono, sin GPU
 ```
 
-## Convenciones de nombre
+## Por qué monorepo (y no un solo paquete)
 
-- Carpetas de código en **inglés** (alineado a QVAC, electron-vite y JarvisQ).
-- Dominio en el lenguaje del producto: *trip* = comisión / viático; *receipt* = comprobante; *settlement* = liquidación; *policy* = tope y reglas.
+Expo y electron-vite pelean: Metro vs Vite, React Native vs `react-dom`, `expo-plugin` vs `QvacForgePlugin`, `minSdk` vs `asar: false`. Un `package.json` único obliga a esa pelea. Dos repos romperían el pin 0.18.2 y los DTOs.
 
-## Por qué `src/main|preload|renderer` y no `apps/desktop`
+Workspaces (npm o pnpm) se declaran cuando existan los manifiestos. Este scaffold solo reserva las carpetas.
 
-El tutorial QVAC y el e2e `packages/sdk/e2e/tests/electron` asumen esa forma. `QvacForgePlugin` espera `dist/main`, `dist/preload`, `dist/renderer` (para no chocar con `out/` de Forge). Mover el shell a `apps/` obligaría a pelear con el toolchains desde el día uno.
+## Por qué `apps/desktop/src/main|preload|renderer`
 
-El hexágono vive **al lado**, no dentro del renderer.
+El tutorial QVAC y `QvacForgePlugin` asumen esa forma **dentro del paquete Electron**. Mover el shell a `apps/desktop` no rompe el tutorial: el `cwd` de Forge/Vite es esa app. `dist/main|preload|renderer` sigue evitando el choque con `out/` de Forge.
 
-## Qué irá en cada composición
+## Por qué `app/` en móvil
 
-**`src/composition/electron`**
+Expo Router monta rutas desde `app/` en la raíz del paquete. `src/adapters` queda al lado, no dentro del router.
 
-- Instancia adaptadores Node (`filesystem`, `persistence`, `qvac-visionpsy`).
-- `loadModel` / `completion` / `unloadModel` desde `@qvac/sdk`.
-- Flag Linux: `--no-sandbox` (requisito QVAC en el tutorial Electron).
+## Bundles QVAC separados
 
-**`src/composition/bare`**
+Cada app tiene `qvac/` y `config/qvac/`. El worker del teléfono no debe arrastrar el GGUF del LLM de escritorio, ni al revés.
 
-```ts
-// Intención (aún no hay archivos de código):
-import process from 'bare-process'
-import { plugins } from '@qvac/inference'
-import { llmPlugin } from '@qvac/inference/llamacpp-completion/plugin'
-globalThis.process = process
-const sdk = plugins([llmPlugin])
-```
+## Compositions
 
-Bare no spawnea worker y **no auto-registra** plugins. Esa es la única razón de `adapters/driven/qvac-bare` como carpeta distinta de `qvac-visionpsy`.
+**Desktop `composition/electron`:** LLM pesado, persistencia, exporters, `startQVACProvider`, `--no-sandbox` en Linux.
+
+**Desktop `composition/bare`:** `bare-process` + `plugins([llmPlugin])` si el proceso *es* Bare.
+
+**Mobile `composition/expo`:** `expo-plugin`, VisionPsy, cámara, transporte del DTO. Device físico; Expo Go no carga los addons C++.
