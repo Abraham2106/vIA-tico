@@ -10,9 +10,9 @@ El usuario pidió la línea **18.2**. VisionPsy Nano llega en 0.18.0; 0.18.2 es 
 
 ## Decisión
 
-- Dependencia de aplicación: `@qvac/sdk@0.18.2`.
+- Dependencia de **ambas** apps: `@qvac/sdk@0.18.2`.
 - Camino Bare: `@qvac/inference@0.18.2`, no `bare-sdk`.
-- Sin capa wrapper: el adaptador driven importa el SDK.
+- Sin capa wrapper: cada adaptador driven importa el SDK.
 
 ## Consecuencias
 

@@ -1,68 +1,71 @@
 # Arquitectura hexagonal
 
-ViáticoCero usa **puertos y adaptadores** para que el dominio de viáticos no dependa de Electron, del worker Bare ni de las constantes de VisionPsy.
+El dominio de viáticos no depende de Expo, Electron, Bare ni de las constantes de modelo.
 
 ## Regla de dependencia
 
 ```
-UI React  →  IPC (puerto driving)  →  casos de uso  →  puertos driven  →  adaptadores
-                                      ↑
-                                   dominio
+móvil (cámara)  →  analyze-receipt (VisionPsy)  →  DTO (contracts)
+                                                      ↓
+desktop inbox  →  ingest-vision-result → analyze-with-llm → UI / exporters
+                 ↑
+              packages/core
 ```
 
-- El **núcleo** (`src/core`) no importa `electron`, `react`, `@qvac/sdk`, `@qvac/inference`, `fs` ni Vite.
-- Los **adaptadores driven** implementan puertos outbound (`IVisionInference`, `IReceiptStore`, `IFileSystem`, …).
-- Los **adaptadores driving** (IPC + renderer) invocan puertos inbound (casos de uso).
-- Las **raíces de composición** (`src/composition/*` + `src/main`) cablean implementaciones concretas.
+- `packages/core` no importa `expo`, `react-native`, `electron`, `react`, `@qvac/sdk`, `@qvac/inference`, `fs` ni Vite.
+- `packages/contracts` es el único paquete que ambas apps pueden importar además del core (DTOs, no I/O).
+- Adaptadores driven viven **dentro de cada app** (toolchains distintos).
+- Composition roots: `apps/mobile/src/composition/expo` y `apps/desktop/src/composition/electron`.
 
-## Por qué hexagonal aquí
+## Puertos outbound (previsto)
 
-QVAC **no puede vivir en el renderer**. Native addons y el worker Bare corren en el proceso main (o in-process Bare). Si el UI importara `@qvac/sdk`, el hexágono quedaría roto y el empaquetado (`asar`, prebuilds `.bare`) se filtraría a React.
-
-Hexagonal convierte esa restricción de runtime en un puerto:
-
-| Puerto (outbound) | Implementación prevista | Runtime |
+| Puerto | Quién lo implementa | Runtime |
 | --- | --- | --- |
-| `IVisionInference` | `adapters/driven/qvac-visionpsy` | Electron main → `@qvac/sdk` → worker Bare |
-| `IVisionInference` (alt.) | `adapters/driven/qvac-bare` | `@qvac/inference` + `bare-process` |
-| `IFileSystem` | `adapters/driven/filesystem` | `node:fs` — VisionPsy exige `attachments[].path` en disco |
-| `IReceiptStore` / persistencia | `adapters/driven/persistence` | SQLite o JSON local |
-| `IClock` | `adapters/driven/clock` | reloj de sistema |
+| `IVisionInference` | `apps/mobile/.../qvac-visionpsy` | Expo + `@qvac/sdk` + VisionPsy local |
+| `ILanguageModel` | `apps/desktop/.../qvac-llm` | Electron main + LLM pesado local |
+| `IJobTransport` | móvil envía / desktop recibe | DTO por canal propio; P2P QVAC no es el dueño del expediente |
+| `IQvacProvider` | `apps/desktop/.../qvac-provider` | `startQVACProvider()` — opcional, si el celular pide tokens del LLM |
+| `ICamera` | `apps/mobile/.../camera` | Expo |
+| `IFileSystem` | cada app | Nano exige `attachments[].path` en disco |
+| `IReceiptStore` | desktop (sistema de registro); móvil puede cachear | SQLite / JSON local |
+| `IReportExporter` | `apps/desktop/.../exporters/{pdf,csv,xlsx,json}` | solo escritorio |
+| `IClock` | ambas | reloj de sistema |
 
-El dominio habla de *analizar un recibo*, no de `loadModel({ projectionModelSrc })`.
+El dominio habla de *hechos de un recibo* y *liquidar un viaje*, no de `projectionModelSrc` ni de `delegate.providerPublicKey`.
 
-## Mapa al proceso Electron
+## Flujo de un comprobante
 
-El tutorial oficial de QVAC separa tres procesos. En hexagonal:
+1. El usuario dispara en Android. El adaptador de cámara deja un archivo en disco.
+2. `analyze-receipt` llama `IVisionInference` (VisionPsy Flash, una imagen). Sale un DTO de `packages/contracts/vision-result`.
+3. `pair-devices` ya emparejó (QR con la clave del desktop). `IJobTransport` entrega un `analysis-job`.
+4. Electron **inbox** muestra el job. `ingest-vision-result` lo persiste. `analyze-with-llm` llama `ILanguageModel` en el PC.
+5. El renderer (React) enseña el análisis: aceptar, editar, guardar, exportar.
+6. `export-report` usa `IReportExporter` (PDF, CSV, XLSX, JSON).
 
-| Proceso electron-vite | Rol hexagonal |
+Delegated inference (`loadModel({ delegate })`) es un **extra**: el teléfono puede pedir al LLM del PC sin pasar por la UI. El expediente que se guarda y se convierte vive en desktop.
+
+## Electron es app, no worker
+
+| Proceso en `apps/desktop` | Rol |
 | --- | --- |
-| `src/main` | Composition root + host del adaptador QVAC |
-| `src/preload` | Driving adapter: `contextBridge` (superficie estrecha) |
-| `src/renderer` | Driving adapter UI: React no conoce QVAC |
-| `src/adapters/driving/ipc` | Handlers `ipcMain` que delegan a casos de uso |
-| `src/core` | Independiente del proceso |
+| `src/main` | Composition + QVAC LLM + persistencia + exporters + provider |
+| `src/preload` | `contextBridge` estrecho |
+| `src/renderer` | Producto: inbox, detalle, guardar, formatos |
+| `src/adapters/driving/ipc` | `ipcMain` → casos de uso |
 
-Flujo de un recibo:
+QVAC no entra al renderer (igual que el tutorial). La UI sí es de usuario final.
 
-1. El renderer elige un archivo y pide “analizar”.
-2. Preload reenvía por IPC (sin Node integration en el renderer).
-3. Main persiste una copia en disco (QVAC multimodal lee **paths**, no blobs del DOM).
-4. El caso de uso `analyze-receipt` llama `IVisionInference`.
-5. El adaptador VisionPsy hace `loadModel` + `completion` con el par weights + `mmproj`.
-6. El dominio recibe un DTO (merchant, fecha, total, moneda), no tokens del modelo.
+## Móvil es captura, no liquidación
 
-## Referencia de producto QVAC + hexagonal
+Pantallas Expo Router (`apps/mobile/app/{capture,preview,pairing}`): foto, preview del DTO, estado de envío. Sin PDF ni políticas pesadas en el teléfono.
 
-[JarvisQ](https://github.com/Helldez/JarvisQ) es el proyecto público más cercano: núcleo hexagonal + `@qvac/sdk` directo + Electron en main + UI desacoplada. ViáticoCero copia **esas reglas**, no su pipeline de voz:
+## Arquitectura de referencia
 
-1. `src/core` libre de plataforma.
-2. SDK sin wrapper.
-3. Adaptadores por target (`electron` / `bare`).
-4. Paths de modelos derivados de un puerto de filesystem, nunca hardcodeados.
+- [JarvisQ](https://github.com/Helldez/JarvisQ): core platform-free, SDK directo, adaptadores por target. Pin `@qvac/sdk@0.18.2`.
+- [Beacon](https://github.com/edycutjong/beacon): pairing QR + provider en laptop + `loadModel({ delegate })`. Nosotros priorizamos el DTO hacia la **app** desktop.
 
-## Límites del hexágono en este scaffold
+## Límites
 
-- Un solo bounded context inicial: **liquidación de viáticos**.
-- Un solo modelo de visión: VisionPsy Nano (Flash por defecto; Base como perfil).
-- Un solo delivery: escritorio. Un futuro Expo reimplementaría puertos en `src/adapters` y una composición nueva; el dominio no se mueve.
+- Un bounded context: liquidación de viáticos.
+- VisionPsy solo en móvil; LLM pesado solo en desktop.
+- Un recibo = una imagen (límite de VisionPsy).

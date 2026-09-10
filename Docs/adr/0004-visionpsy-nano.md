@@ -1,22 +1,22 @@
-# ADR 0004 — VisionPsy Nano como único VLM
+# ADR 0004 — VisionPsy Nano solo en el celular
 
 ## Estado
 
-Aceptada.
+Aceptada (enmendada: ya no corre en Electron).
 
 ## Contexto
 
-ViáticoCero necesita leer comprobantes en el dispositivo. Tether publica VisionPsy Nano (460M) para una imagen por consulta, con pares Flash/Base en el SDK 0.18.x.
+VisionPsy Nano (~460M, una imagen) está pensado para el teléfono. El LLM pesado no.
 
 ## Decisión
 
-- Default: **Flash** (`VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` + mmproj homónimo + `image_no_upscale: 'on'`).
-- Perfil opcional: Base (`*_1`, sin el flag).
-- Plugin bundle: solo `llamacpp-completion`.
+- Default móvil: **Flash** + mmproj homónimo + `image_no_upscale: 'on'`.
+- Base (`*_1`) como perfil opcional.
+- Plugin: `llamacpp-completion`.
+- Desktop **no** carga VisionPsy; consume el DTO de `packages/contracts/vision-result`.
 - El dominio no nombra GGUF ni mmproj.
 
 ## Consecuencias
 
-- Calidad de OCR/inglés limitada; el adaptador debe validar salida.
-- Multi-imagen queda fuera de alcance (el modelo no está entrenado para eso).
-- No se añade `ggml-ocr` en el scaffold.
+- Salida en inglés a validar en el adaptador/contrato.
+- Sin multi-imagen. Sin `ggml-ocr` en el scaffold.
