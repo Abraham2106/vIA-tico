@@ -15,12 +15,12 @@ Un Git, **cuatro paquetes**. Dos artefactos de usuario (APK + app Electron). El 
 
 | Ruta | Tocas cuando… |
 | --- | --- |
-| `packages/core` | Veredicto: viaje, recibo, política, excepciones, liquidación. El modelo no vive aquí |
-| `packages/contracts` | Schema teléfono ↔ PC (`vision-result` + confianza + RAW, `analysis-job`, `pairing`, `export-formats`) |
-| `apps/mobile` | Cámara, VisionPsy, Expo, Metro, Android, capture/preview/pairing |
-| `apps/desktop` | Centro de excepciones, liquidación, Qwen Instruct, PDF/CSV/XLSX/JSON, Electron |
-| `tests/unit` | Veredictos sin GPU ni GGUF |
-| `Docs/` | Empieza por `00-producto.md`; no implementes contra un ADR sin enmendarlo |
+| `packages/core` | Veredicto: viaje, recibo, motivo, política, excepciones, conciliación, auditoría |
+| `packages/contracts` | `vision-result`, `motive-classification` (sin veredicto), `verdict`, `audit-event`, `analysis-job`, `pairing`, `export-formats` |
+| `apps/mobile` | Cámara, motivo libre, VisionPsy, Expo |
+| `apps/desktop` | Excepciones, conciliación, auditoría, Qwen (postproceso + classify-motive), export |
+| `tests/unit` | Veredictos sin GPU |
+| `Docs/` | Empieza por `00-producto.md` (**tesis** excepciones documentales + **cuña** viáticos) y ADR 0013 |
 
 ## Reglas
 
@@ -30,11 +30,11 @@ Un Git, **cuatro paquetes**. Dos artefactos de usuario (APK + app Electron). El 
 4. **Cambio de DTO = un PR que toca contracts + las dos apps** si hace falta. No “lo arreglo luego en el otro repo”.
 5. **Workspaces aún no existen** (no hay `package.json`). Cuando se añadan: npm o pnpm workspaces en la raíz, un manifiesto por app/paquete. No inventes un mega-`package.json` único.
 6. **Workers QVAC separados:** `apps/desktop/qvac/` y `apps/mobile/qvac/` + `config/qvac` por app.
-7. Implementación nueva: **puerto en core → adaptador en la app que tiene el runtime**. VisionPsy no va en desktop. Instruct no va en móvil. Exporters no van en móvil. El veredicto no va en el adaptador QVAC.
+7. Implementación nueva: **puerto en core → adaptador en la app**. VisionPsy no va en desktop. Instruct no va en móvil. `contracts/verdict` no lo escribe el adaptador QVAC. `classify-motive` no incluye campo `veredicto`. Sin carpetas de etapa 2–3 (ERP, matching OC).
 
 ## Cómo arrancar un cambio
 
-1. Lee `Docs/00-producto.md` y el ADR relevante (`0010` autoridad, `0011` excepciones, `0006` monorepo, `0007` dos apps, `0008` DTO).
+1. Lee `Docs/00-producto.md` (tesis vs cuña) y el ADR (`0013` scaffold, `0010` autoridad, `0011` excepciones).
 2. Pregúntate: ¿es dominio, contrato o delivery? Solo entonces crea archivos.
 3. Si el usuario pide “la app”, aclara **cuál** (móvil vs desktop) o toca el flujo entero vía contracts.
 

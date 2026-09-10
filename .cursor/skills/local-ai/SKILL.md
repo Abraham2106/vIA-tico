@@ -15,7 +15,7 @@ El producto existe para que el **recibo no viaje a un API de terceros**. Inferen
 | Dato | Dónde se procesa |
 | --- | --- |
 | Foto del comprobante | VisionPsy Nano **en el celular** (document understanding / OCR on-device, Tether) |
-| Postproceso lingüístico | Qwen3-4B-Instruct **en el escritorio** (`QWEN3_4B_INST_Q4_K_M`) |
+| Postproceso lingüístico y clasificación de motivo | Qwen3-4B-Instruct **en el escritorio** (`QWEN3_4B_INST_Q4_K_M`) |
 | Veredicto `PROCEDE / REVISIÓN / NO PROCEDE` | **Código** en `packages/core` |
 | Expediente, PDF, Excel | Disco local del desktop |
 

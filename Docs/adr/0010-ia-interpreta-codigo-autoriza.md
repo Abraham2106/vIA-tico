@@ -6,7 +6,7 @@ Aceptada.
 
 ## Contexto
 
-El scaffold original presentaba ViáticoCero como «leer un recibo con VisionPsy y mostrar/exportar el análisis». Eso deja la autoridad implícita en el modelo y no pasa el test de los proyectos que ganan con QVAC: si el modelo se vuelve loco, ¿cuánto daño puede hacer?
+El scaffold original presentaba ViáticoCero como «leer un recibo con VisionPsy y mostrar/exportar el análisis». La tesis es más amplia: **excepciones documentales financieras** (la IA no autoriza; el código veredicta; el humano ve ⚠). La cuña es un viaje.
 
 ## Decisión
 
@@ -20,6 +20,6 @@ Test permanente: si quitar QVAC (o sustituirlo por cloud/reglas solas) deja el m
 
 ## Consecuencias
 
-- El desktop no es un visor del chat del LLM: es registro + excepciones + liquidación.
+- El desktop no es un visor del chat del LLM: es **centro de excepciones** (hoy: liquidación de viaje).
 - Evals de dominio sobre veredictos, no sobre «el modelo escribió algo plausible».
 - Supersede la lectura de producto de Docs pre-0010 («el PC razona y enseña el resultado» como fin).
