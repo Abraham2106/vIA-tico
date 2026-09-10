@@ -2,19 +2,19 @@
 
 ## Estado
 
-Aceptada.
+Aceptada (enmendada: un `qvac/` **por app**).
 
 ## Contexto
 
-El worker QVAC corre en **Bare**. Node/Electron hablan con ese worker; un proceso Bare usa `@qvac/inference` in-process y debe registrar plugins a mano (`bare-process` como `globalThis.process`).
+El worker QVAC corre en Bare. Electron lo spawnea; Expo lo embebe vía BareKit; un proceso Bare usa `@qvac/inference` y registra plugins a mano.
 
 ## Decisión
 
-- Carpeta `qvac/` reservada al bundle del worker.
-- `src/composition/bare` + `src/adapters/driven/qvac-bare` para el camino in-process.
-- `config/qvac` usará **JSON** (válido en Node y Bare; `qvac.config.ts` no corre en Bare).
+- `apps/desktop/qvac/` y `apps/mobile/qvac/` — bundles distintos.
+- Config JSON en `apps/*/config/qvac` (válido en Node, Bare y Expo; no `.ts` en móvil).
+- `apps/desktop/src/composition/bare` para in-process; `apps/mobile/src/composition/expo` para BareKit.
 
 ## Consecuencias
 
-- Dos compositions, un solo hexágono.
-- Sin `asar`. Prebuilds por arch.
+- El worker del teléfono no arrastra el LLM de escritorio.
+- Electron: `asar: false`. Móvil: prebuild nativo, device físico.

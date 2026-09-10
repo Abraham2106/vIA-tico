@@ -1,52 +1,62 @@
-# QVAC, VisionPsy y Bare
+# QVAC, VisionPsy, LLM pesado y Bare
 
 ## SDK 0.18.2
 
 - npm: [`@qvac/sdk@0.18.2`](https://www.npmjs.com/package/@qvac/sdk/v/0.18.2)
-- Changelog: [QVAC SDK v0.18.2](https://qvac.tether.io/changelog/sdk-v0-18-2) (26 ago 2026)
-- El cliente JS corre el worker **in-process sobre Bare** (RPC `bare-rpc` en Node/Electron; `@qvac/inference` si el proceso *es* Bare).
+- Changelog: [QVAC SDK v0.18.2](https://qvac.tether.io/changelog/sdk-v0-18-2)
+- Móvil y desktop hablan el **mismo** cliente; el worker Bare va empaquetado **por app**.
 
-Pin 0.18.2 porque:
+`@qvac/bare-sdk` muere en 0.18.2. In-process Bare = `@qvac/inference`.
 
-1. Es la línea que el usuario pidió.
-2. VisionPsy Nano entra en 0.18.0; 0.18.2 es un parche de addons (`@qvac/diffusion-cpp`) sobre esa familia de constantes.
-3. `@qvac/bare-sdk` muere en 0.18.2 — el scaffold **no** crea carpeta para ese paquete.
+## Dónde corre cada modelo
 
-## VisionPsy Nano (modelo de visión)
+| Modelo | App | Cómo se carga |
+| --- | --- | --- |
+| VisionPsy Nano | `apps/mobile` | `loadModel` local + `projectionModelSrc` + adjunto en disco |
+| LLM pesado | `apps/desktop` | `loadModel` local en main; la UI no importa el SDK |
 
-Familia PSY de Tether, ~460M, una imagen por query. Para viáticos: un recibo por inferencia.
+No se delega VisionPsy al PC. El teléfono extrae; el PC analiza el DTO.
 
-Pares oficiales (docs Multimodal):
+### VisionPsy Nano (móvil)
 
 | Perfil | Weights | mmproj | `image_no_upscale` |
 | --- | --- | --- | --- |
 | **Flash** (default) | `VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` o `_Q4_K_M` | `MMPROJ_VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` | `'on'` |
-| **Base** | mismas constantes con sufijo `_1` | `MMPROJ_VISIONPSY_NANO_460M_MULTIMODAL_Q8_0_1` | no setear |
+| **Base** | sufijo `_1` | `MMPROJ_VISIONPSY_NANO_460M_MULTIMODAL_Q8_0_1` | no setear |
 
-Las constantes **sin** `_1` son Flash; **con** `_1` son Base. Mezclar el flag con el par equivocado **pasa validación y degrada calidad** (los dos mmproj declaran el mismo `preproc_image_size`).
+Mezclar flag y par **pasa validación y degrada calidad**. Solo el adaptador `qvac-visionpsy` conoce las constantes.
 
-El adaptador `qvac-visionpsy` es el único sitio que puede conocer esas constantes. El caso de uso recibe `AnalyzeReceiptResult`.
+VisionPsy está optimizado en **inglés** y **una imagen**. El DTO se valida en `contracts`; el dominio sigue en español.
 
-Limitación relevante para ViáticoCero: VisionPsy está **optimizado en inglés**. El dominio sigue en español; el adaptador deberá fijar el prompt y validar el JSON extraído. No se cambia de modelo en el scaffold.
+Adjuntos: `history[].attachments: [{ path }]`. Por eso `filesystem` + `resources/samples/receipts` en móvil.
 
-Adjuntos: `history[].attachments: [{ path: "/abs/recibo.jpg" }]`. Por eso existe el puerto de filesystem y `resources/samples/receipts`.
+### LLM pesado (desktop)
 
-## Bare en Electron
+La constante concreta se elige en implementación (GGUF llama.cpp vía el mismo plugin). El hexágono solo ve `ILanguageModel`. Ese proceso además puede `startQVACProvider()` para delegated inference.
 
-Del tutorial y de `QvacForgePlugin` (commit `6536b03` en `tetherto/qvac`):
+## Bare y empaquetado
 
-1. `qvac bundle sdk` (o el plugin Forge) escribe `qvac/worker.bundle.js`.
-2. **`asar: false` es forzado**: el worker Bare no carga addons nativos desde `app.asar`.
-3. Builds **universal macOS bloqueados** (prebuilds `darwin-arm64.bare` vs `darwin-x64.bare`).
-4. `electron.vite.config` debe emitir a `dist/main|preload|renderer`, no a `out/`.
-5. Plugin de config: solo `llamacpp-completion` para no arrastrar TTS/diffusion/ASR.
+**Electron** (tutorial + commit `6536b03`):
 
-Linux: `electron-vite dev -- --no-sandbox`. El e2e oficial (`packages/sdk/e2e/tests/electron/main.ts`) hace `app.commandLine.appendSwitch('no-sandbox')`.
+1. Bundle en `apps/desktop/qvac/worker.bundle.js`.
+2. `asar: false` (addons `.bare` no cargan desde `app.asar`).
+3. Sin build universal macOS.
+4. Vite → `dist/main|preload|renderer`.
+5. Linux: `--no-sandbox`.
+
+**Expo:** `react-native-bare-kit` + `@qvac/sdk/expo-plugin`, `minSdkVersion` 29, **dispositivo físico** (llama.cpp no corre en emulador). `qvac.config.json` (no `.ts`: Bare/Expo no lo leen igual).
+
+## Transporte teléfono → escritorio
+
+Camino de producto: DTO `vision-result` envuelto en `analysis-job`, inbox en Electron.
+
+Camino opcional QVAC: [delegated inference](https://docs.qvac.tether.io/p2p-capabilities/delegated-inference/) — `loadModel({ delegate: { providerPublicKey } })` desde el celular hacia el LLM del PC. Cold DHT 15–45 s. Eso **no** sustituye guardar/exportar en la UI desktop.
 
 ## Dónde **no** va QVAC
 
-- Renderer React.
-- `src/core/**`.
-- Tests unitarios de dominio (se mockea `IVisionInference`).
+- `apps/desktop/src/renderer/**`
+- `packages/core/**`
+- `packages/contracts/**` (solo datos)
+- Tests unitarios (`tests/unit`) — se mockean los puertos
 
-Los tests de verdad del SDK viven en `tests/integration/qvac` (máquina con addons nativos), no en el hexágono.
+Integración real: `apps/*/tests/integration/qvac`.

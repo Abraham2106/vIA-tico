@@ -1,46 +1,47 @@
 # Stack de ViáticoCero
 
-Versiones y runtime **fijados en este scaffold**. No se mezcla un segundo motor de inferencia ni un segundo empaquetador.
+Versiones y runtime **fijados**. Un hexágono, dos toolchains; no se mezcla un segundo motor de inferencia.
 
 ## Matriz
 
 | Capa | Elección | Versión / nota |
 | --- | --- | --- |
-| Lenguaje | TypeScript | Todo el hexágono y los adaptadores |
-| Inferencia local | Tether **QVAC** JS/TS SDK | **`@qvac/sdk@0.18.2`** |
-| Motor in-process Bare | `@qvac/inference` | Misma línea **0.18.2** (`@qvac/bare-sdk` está deprecado; 0.18.2 es su último release) |
-| Modelo de visión | **VisionPsy Nano** (familia PSY de Tether) | Constantes multimodales del SDK 0.18.x |
-| Worker | **Bare** | El SDK empaqueta un worker Bare; `asar: false` es obligatorio |
-| Escritorio | Electron | Main carga QVAC; renderer **no** importa el SDK |
-| UI | React + Vite vía **electron-vite** | Scaffold oficial QVAC: `@quick-start/electron` template `react-ts` |
-| Empaquetado | Electron Forge + `QvacForgePlugin` | `@qvac/sdk/electron-forge` |
-| Host Node | Node.js **≥ 22.17**, npm **≥ 10.9** | Requisito del SDK, no de este repo |
+| Lenguaje | TypeScript | `packages/*` y ambas apps |
+| Inferencia | Tether **QVAC** JS/TS SDK | **`@qvac/sdk@0.18.2`** en móvil y desktop |
+| Motor in-process Bare | `@qvac/inference` | Misma línea **0.18.2** (`@qvac/bare-sdk` deprecado) |
+| Visión (solo celular) | **VisionPsy Nano** | Constantes multimodales 0.18.x; una imagen por query |
+| LLM (solo escritorio) | Modelo pesado vía QVAC llama.cpp | No corre en el teléfono |
+| Worker | **Bare** | Bundle por app (`apps/*/qvac/`); `asar: false` en Electron |
+| App escritorio | Electron + React + Vite | `electron-vite` template `react-ts` **dentro de** `apps/desktop` |
+| App móvil | Expo + React Native | Expo **≥ 54**, `react-native-bare-kit`, `@qvac/sdk/expo-plugin` |
+| Empaquetado desktop | Electron Forge + `QvacForgePlugin` | Tutorial QVAC Electron |
+| Empaquetado móvil | Prebuild nativo Expo | `npx expo run:android --device` — no Expo Go, no emulador |
+| Host Node (desktop / CI) | Node.js **≥ 22.17**, npm **≥ 10.9** | Requisito del SDK |
+| Android | API 31+ / `minSdkVersion` 29, **arm64 físico** | Requisito QVAC; Vulkan/OpenCL si hay GPU |
 
-`18.2` en este proyecto **es QVAC SDK 0.18.2**, no React 18.2. El tutorial de Electron de QVAC no pinnea React; la UI seguirá la versión que traiga el template `react-ts` de electron-vite.
+`18.2` es **QVAC SDK 0.18.2**, no React 18.2. Cada app trae la UI que dicta su tutorial (electron-vite vs Expo 54).
 
-## Por qué este stack (y no otro)
+## Por qué este split
 
-1. **QVAC 0.18.2** es la línea que publica las constantes VisionPsy Nano (`VISIONPSY_NANO_460M_MULTIMODAL_*` + `MMPROJ_VISIONPSY_NANO_460M_MULTIMODAL_*`) y el plugin de Electron Forge. Pinnear 0.18.2 evita deriva silenciosa de addons nativos.
-2. **VisionPsy** es el VLM de Tether para una imagen por consulta (recibo, ticket, captura). Encaja el caso de viáticos: un adjunto, extraer monto / fecha / merchant, no un chat genérico.
-3. **Bare** es el runtime real del worker QVAC. En Electron el SDK spawnea ese worker; en un entry Bare in-process se usa `@qvac/inference` con registro explícito de plugins. El scaffold reserva **las dos** raíces de composición (`src/composition/electron` y `src/composition/bare`).
-4. **Electron + React + Vite** es el camino documentado por Tether (`npm create @quick-start/electron@latest -- --template react-ts`), no un invento paralelo. Conservamos `src/main`, `src/preload`, `src/renderer` para no pelear con electron-vite.
-5. **TypeScript** es el cliente de primer nivel del SDK (`@qvac/sdk` tipado) y el contrato de los puertos hexagonales.
+1. VisionPsy Nano cabe en el bolsillo; un LLM pesado no. El celular extrae; el PC razona.
+2. Expo y electron-vite **no caben en un solo `package.json`** (Metro vs Vite, RN vs React DOM, plugin Expo vs Forge). Por eso monorepo, no paquete único.
+3. Electron **sigue siendo producto**: inbox, detalle, guardar, exportar. No es un daemon sin UI.
+4. El SDK se llama **directo** en cada adaptador driven. Subir de 0.18.2 es un bump, no un shim.
+5. `llamacpp-completion` es el plugin de ambos modelos (VLM y LLM). Config JSON **por app**, porque el bundle nativo debe ser distinto.
 
-## Qué queda fuera (a propósito)
+## Qué queda fuera
 
-- Expo / React Native (QVAC lo soporta; ViáticoCero arranca escritorio).
-- Python `tetherto-qvac-sdk` (mismo worker, otro cliente).
-- Wrappers sobre `@qvac/sdk`: el adaptador llama al SDK **directo**. Subir de 0.18.2 debe ser un bump de `package.json`, no un shim.
-- OCR aparte (`@qvac/sdk/ggml-ocr/plugin`): VisionPsy ya cubre documento + imagen. El plugin OCR se puede añadir después sin tocar el dominio.
+- Kotlin/Jetpack como app (Android Studio es toolchain: `adb`, SDK).
+- Python `tetherto-qvac-sdk`.
+- OCR `ggml-ocr` (VisionPsy cubre el comprobante).
+- UI compartida React ↔ React Native (solo tipos y dominio).
 
-## Plugin QVAC que este producto necesita
+## Plugins QVAC por app (cuando existan los JSON)
 
-VisionPsy se carga como LLM multimodal llama.cpp. En `qvac.config.json` (cuando exista) el bundle debe listar **solo**:
+Móvil (`apps/mobile/config/qvac`):
 
 ```json
-{
-  "plugins": ["@qvac/sdk/llamacpp-completion/plugin"]
-}
+{ "plugins": ["@qvac/sdk/llamacpp-completion/plugin"] }
 ```
 
-En Bare in-process el equivalente es registrar `llmPlugin` desde `@qvac/inference/llamacpp-completion/plugin` **antes** de la primera llamada.
+Escritorio (`apps/desktop/config/qvac`): el mismo plugin; el **modelo** cargado es el LLM pesado, no VisionPsy. Listar de más hincha el worker (TTS, diffusion, ASR).
