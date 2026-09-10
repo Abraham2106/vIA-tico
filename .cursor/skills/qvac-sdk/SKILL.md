@@ -39,7 +39,7 @@ Bare in-process: registrar `llmPlugin` **antes** de la primera llamada (`plugins
   - Tickets densos: **Base** (`*_1`, **sin** `image_no_upscale`).
   - Latencia / RAM justa: **Flash** + `VISIONPSY_NANO_460M_MULTIMODAL_Q8_0` + mmproj homónimo + `image_no_upscale: 'on'`.
   - Mezclar flag y par degrada calidad y pasa validación: no lo hagas.
-- **Desktop:** `QWEN3_4B_INST_Q4_K_M` (Instruct). **No** `QWEN3_4B_Q4_K_M` (difusión). El adaptador `qvac-llm` nombra la constante; el dominio no. El modelo no emite `PROCEDE`.
+- **Desktop:** `QWEN3_4B_INST_Q4_K_M` (Instruct) para postproceso lingüístico **y** `classify-motive`. **No** `QWEN3_4B_Q4_K_M` (difusión). El modelo no emite `PROCEDE` ni campo `veredicto`.
 
 Detalle de pares: `Docs/04-qvac-visionpsy-bare.md`.
 

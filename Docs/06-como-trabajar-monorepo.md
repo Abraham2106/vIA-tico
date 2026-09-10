@@ -6,10 +6,10 @@ ViáticoCero es **un repo, dos apps, un hexágono**. Las reglas cortas para huma
 
 1. Clona **un** Git. No hay segundo remoto para el celular.
 2. Elige superficie:
-   - Dominio / veredictos / excepciones → `packages/core` (ADR 0010)
+   - Dominio / veredictos / excepciones / motivo / auditoría → `packages/core` (ADR 0010, 0013)
    - JSON teléfono ↔ PC → `packages/contracts` (schema, no texto libre)
-   - Cámara o VisionPsy → `apps/mobile` (Expo/RN, **no Flutter**)
-   - Centro de excepciones, liquidación, PDF/Excel → `apps/desktop`
+   - Cámara, motivo libre o VisionPsy → `apps/mobile` (Expo/RN, **no Flutter**)
+   - Centro de excepciones, conciliación, auditoría, PDF/Excel → `apps/desktop`
 3. Un PR puede tocar varios paquetes si el DTO o un caso de uso cruza dispositivos.
 4. Workspaces npm en la raíz (`packages/*` + `apps/*`). Expo y Electron **no** comparten un solo manifiesto de app; cada una tiene el suyo. `.npmrc` usa `install-strategy=nested` para no pelear React DOM vs React Native.
 
@@ -31,6 +31,6 @@ En el chat del Agent: `/viaticocero-monorepo`, `/qvac-sdk`, etc.
 
 ## Relación con Docs/
 
-`Docs/` justifica **por qué**. Empieza por [00-producto.md](./00-producto.md). Las skills dicen **cómo debe comportarse el agente**. Si chocan, gana el ADR (0010–0012 si es producto; 0001–0009 si es runtime) y se enmenda la skill en el mismo PR.
+`Docs/` justifica **por qué**. Empieza por [00-producto.md](./00-producto.md): **tesis** (excepciones documentales financieras) y **cuña** (viáticos). Las skills dicen **cómo debe comportarse el agente**. Si chocan, gana el ADR (0013 scaffold; 0010–0012 producto; 0001–0009 runtime).
 
 No revivas `src/` en la raíz (scaffold de una sola app, PR #1).
