@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "@viaticocero/contracts": ["./packages/contracts/index.ts"],
+      "@viaticocero/core": ["./packages/core/index.ts"]
+    }
+  },
+  "include": [
+    "packages/contracts/**/*.ts",
+    "packages/core/**/*.ts",
+    "tests/**/*.ts"
+  ]
+}

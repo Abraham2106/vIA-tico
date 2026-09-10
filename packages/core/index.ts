@@ -1,0 +1,41 @@
+export type {
+  AnalysisJob,
+  ExportArtifact,
+  ExportFormat,
+  PairingPayload,
+  PairedDevice,
+  VisionResult,
+} from '@viaticocero/contracts'
+export * from './domain/shared/index.ts'
+export * from './domain/traveler/index.ts'
+export * from './domain/trip/index.ts'
+export * from './domain/receipt/index.ts'
+export * from './domain/policy/index.ts'
+export * from './domain/exception/index.ts'
+export * from './domain/settlement/index.ts'
+export * from './domain/services/digit-guard.ts'
+export * from './domain/services/duplicates.ts'
+export * from './domain/services/verdict-engine.ts'
+export * from './domain/services/settlement.ts'
+export * from './domain/services/ambiguous-motive.ts'
+export * from './application/ports/outbound/index.ts'
+export * from './application/ports/inbound/index.ts'
+export * from './application/ports/outbound/workspace.ts'
+export * from './application/workspace.ts'
+export * from './application/use-cases/validate-extraction/index.ts'
+export * from './application/use-cases/validate-policy/index.ts'
+export * from './application/use-cases/detect-duplicates/index.ts'
+export * from './application/use-cases/analyze-with-llm/index.ts'
+export * from './application/use-cases/analyze-receipt/index.ts'
+export * from './application/use-cases/register-trip/index.ts'
+export * from './application/use-cases/attach-receipt/index.ts'
+export * from './application/use-cases/ingest-vision-result/index.ts'
+export * from './application/use-cases/open-exception/index.ts'
+export * from './application/use-cases/settle-trip/index.ts'
+export * from './application/use-cases/export-report/index.ts'
+export * from './application/use-cases/pair-devices/index.ts'
+export * from './application/use-cases/resolve-exception.ts'
+export * from './testing/memory-store.ts'
+export * from './testing/stubs.ts'
+export * from './testing/demo-fixtures.ts'
+export * from './testing/seed-demo.ts'

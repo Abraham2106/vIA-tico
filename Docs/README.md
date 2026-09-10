@@ -3,7 +3,8 @@
 **Tesis:** excepciones documentales financieras. **Cuña:** viáticos (etapa 1).  
 Canónico: [`00-producto.md`](./00-producto.md). Carpetas de la cuña: [`03-estructura.md`](./03-estructura.md) + ADR 0013.
 
-**No hay código de aplicación todavía**: `.gitkeep` y estas decisiones.
+El hexágono, los contratos y las apps (sin motor QVAC) ya están en el árbol. Los ADRs siguen mandando.
+
 
 | Documento | Qué responde |
 | --- | --- |

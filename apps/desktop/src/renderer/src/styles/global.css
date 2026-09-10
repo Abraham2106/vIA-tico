@@ -1,0 +1,156 @@
+:root {
+  color-scheme: dark;
+  --bg: #0e1318;
+  --bg-elev: #151c24;
+  --bg-soft: #1c2530;
+  --line: #2a3542;
+  --text: #e8eef4;
+  --muted: #93a0ae;
+  --accent: #3d9b8f;
+  --accent-2: #5ec4b6;
+  --warn: #e8a54b;
+  --danger: #e05d5d;
+  --ok: #5cbf7a;
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); }
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a { color: var(--accent-2); }
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100%;
+}
+
+.sidebar {
+  background: #0b1015;
+  border-right: 1px solid var(--line);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand {
+  padding: 4px 10px 8px;
+}
+.brand small { color: var(--muted); letter-spacing: 0.04em; }
+.brand strong { display: block; font-size: 20px; }
+
+nav { display: flex; flex-direction: column; gap: 4px; }
+
+.nav-btn {
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav-btn.active, .nav-btn:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.badge {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #3a2a14;
+  color: var(--warn);
+  font-size: 12px;
+  text-align: center;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.main { padding: 24px 28px 40px; overflow: auto; }
+.page-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+.page-head h1 { margin: 0 0 6px; font-size: 28px; }
+.page-head p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.grid { display: grid; gap: 12px; }
+.grid.stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-bottom: 16px; }
+.stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.stat .v { font-size: 22px; margin-top: 4px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover { background: var(--bg-soft); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pill.ok { background: #163523; color: var(--ok); }
+.pill.warn { background: #3a2a14; color: var(--warn); }
+.pill.danger { background: #3a1717; color: var(--danger); }
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.btn.primary { background: var(--accent); border-color: transparent; color: #06221e; font-weight: 700; }
+.btn.danger { background: #3a1717; color: #ffd0d0; }
+.btn.warn { background: #3a2a14; color: #ffe3b3; }
+
+input, select, textarea {
+  background: #0f161d;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  width: 100%;
+}
+label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+
+.detail { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { flex-direction: row; flex-wrap: wrap; }
+  .detail { grid-template-columns: 1fr; }
+}
+
+.muted { color: var(--muted); }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.empty { padding: 28px; color: var(--muted); text-align: center; }

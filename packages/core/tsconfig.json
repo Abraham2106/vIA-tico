@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "@viaticocero/contracts": ["../contracts/index.ts"]
+    }
+  },
+  "include": ["./**/*.ts"]
+}
