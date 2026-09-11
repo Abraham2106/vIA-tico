@@ -1,13 +1,17 @@
 # Golden set (ADR 0012)
 
-Fixtures de dominio (sin JPEG reales en este PR):
+Fixtures JSON de dominio, sin JPEG: cada archivo contiene `extraction` y el
+`expected` (veredicto + reglas) para el viaje demo 10–14 sep.
 
-| Caso | Resultado esperado |
+| Fixture | Resultado esperado |
 | --- | --- |
-| Ticket 10–14 sep, nítido | PROCEDE |
-| Almuerzo 25 sep (fuera de período) | REVISIÓN / FECHA_FUERA_PERIODO |
-| Mismo soda + fecha + monto | REVISIÓN / DUPLICADO |
-| Confianza baja / RAW vacío | REVISIÓN |
-| Hospedaje sobre tope | NO_PROCEDE |
+| `procede-nitido.json` | PROCEDE |
+| `revision-fuera-periodo.json` | REVISIÓN / FECHA_FUERA_PERIODO |
+| `revision-duplicado.json` | REVISIÓN / DUPLICADO |
+| `revision-confianza-baja.json` | REVISIÓN / CONFIANZA_BAJA + DOCUMENTO_ILEGIBLE |
+| `no-procede-hospedaje-tope.json` | NO PROCEDE / TOPE_HOSPEDAJE |
+| `revision-motivo-ambiguo.json` | REVISIÓN / MOTIVO_AMBIGUO |
 
-Los evals de veredicto viven en `tests/unit`. Las fotos + VisionPsy en device físico quedan para el PR de QVAC.
+`tests/unit/application/golden-receipts.test.ts` los ejecuta con dependencias
+en memoria, sin GPU. Las fotos y la integración VisionPsy requieren device
+físico.

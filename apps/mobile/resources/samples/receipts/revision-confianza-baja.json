@@ -1,0 +1,17 @@
+{
+  "id": "revision-confianza-baja",
+  "expected": {
+    "verdict": "REVISION",
+    "rules": ["CONFIANZA_BAJA", "DOCUMENTO_ILEGIBLE"]
+  },
+  "extraction": {
+    "proveedor": "Comercio borroso",
+    "fecha": "2026-09-13",
+    "monto": 3000,
+    "moneda": "CRC",
+    "tipo_documento": "recibo",
+    "confianza_lectura": "baja",
+    "raw_text": "",
+    "categoria": "otro"
+  }
+}

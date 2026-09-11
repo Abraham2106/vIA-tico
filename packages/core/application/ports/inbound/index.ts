@@ -90,6 +90,14 @@ export interface ISettleTrip {
   execute(tripId: string): Promise<Settlement>
 }
 
+export interface IReconcileAdvance {
+  execute(tripId: string): Promise<Settlement>
+}
+
+export interface IDeclareMotive {
+  execute(input: { extraction: VisionResult; motivo?: string }): VisionResult
+}
+
 export interface IExportReport {
   execute(input: { tripId: string; format: ExportFormat; includeRaw?: boolean }): Promise<ExportArtifact>
 }

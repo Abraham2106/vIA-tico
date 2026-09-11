@@ -16,6 +16,8 @@ import { createIngestVisionResult } from './use-cases/ingest-vision-result/index
 import { createPairDevices } from './use-cases/pair-devices/index.ts'
 import { createRecordAudit } from './use-cases/record-audit/index.ts'
 import { createRegisterTrip } from './use-cases/register-trip/index.ts'
+import { createDeclareMotive } from './use-cases/declare-motive/index.ts'
+import { createReconcileAdvance } from './use-cases/reconcile-advance/index.ts'
 import { createResolveException } from './use-cases/resolve-exception.ts'
 import { createCloseTrip, createSettleTrip } from './use-cases/settle-trip/index.ts'
 import { createTraveler } from '../domain/traveler/index.ts'
@@ -27,6 +29,7 @@ export function createWorkspace(deps: CoreDeps) {
   const attachReceipt = createAttachReceipt(deps)
   const ingestVisionResult = createIngestVisionResult(deps)
   const settleTrip = createSettleTrip(deps)
+  const reconcileAdvance = createReconcileAdvance(deps)
   const closeTrip = createCloseTrip(deps)
   const exportReport = createExportReport(deps)
   const pairDevices = createPairDevices(deps)
@@ -34,6 +37,7 @@ export function createWorkspace(deps: CoreDeps) {
   const analyzeReceipt = createAnalyzeReceipt(deps.vision)
   const analyzeWithLlm = createAnalyzeWithLlm(deps.languageModel)
   const classifyMotive = createClassifyMotive(deps.languageModel)
+  const declareMotive = createDeclareMotive()
 
   return {
     deps,
@@ -51,6 +55,7 @@ export function createWorkspace(deps: CoreDeps) {
     attachReceipt: (input: AttachReceiptInput) => attachReceipt.execute(input),
     ingestVisionResult: (job: AnalysisJob) => ingestVisionResult.execute(job),
     settleTrip: (tripId: string) => settleTrip.execute(tripId),
+    reconcileAdvance: (tripId: string) => reconcileAdvance.execute(tripId),
     async closeTrip(tripId: string) {
       const result = await closeTrip.execute(tripId)
       await recordAudit.write({
@@ -68,6 +73,7 @@ export function createWorkspace(deps: CoreDeps) {
     analyzeReceipt: (input: { imagePath: string; profile?: 'base' | 'flash' }) =>
       analyzeReceipt.execute(input),
     analyzeWithLlm: (extraction: VisionResult) => analyzeWithLlm.execute(extraction),
+    declareMotive: (input: { extraction: VisionResult; motivo?: string }) => declareMotive.execute(input),
     classifyMotive: (input: { motivo?: string; extraction?: VisionResult }) =>
       classifyMotive.execute(input),
     async registerTraveler(input: { id?: string; name: string; email?: string }) {
