@@ -23,6 +23,8 @@ jobs:
             script: dist:linux
           - os: windows-latest
             script: dist:win
+          - os: macos-latest
+            script: dist:mac
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +49,10 @@ jobs:
 
             - Windows: `ViaticoCero-win-x64-setup.exe`
             - Linux: `ViaticoCero-linux-x64.AppImage` (`chmod +x` y ejecutar)
+            - macOS Apple Silicon: `ViaticoCero-mac-arm64.dmg`
+            - macOS Intel: `ViaticoCero-mac-x64.dmg`
+
+            En Mac el build no está firmado: clic derecho → Abrir la primera vez.
           files: apps/desktop/release/ViaticoCero-*
           makeLatest: true
         env:

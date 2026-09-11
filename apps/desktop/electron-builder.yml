@@ -34,4 +34,21 @@ linux:
   artifactName: ViaticoCero-linux-${arch}.${ext}
 appImage:
   artifactName: ViaticoCero-linux-${arch}.AppImage
+mac:
+  category: public.app-category.finance
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  identity: null
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  artifactName: ViaticoCero-mac-${arch}.${ext}
+dmg:
+  artifactName: ViaticoCero-mac-${arch}.${ext}
 npmRebuild: false

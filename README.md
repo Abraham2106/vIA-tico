@@ -18,8 +18,12 @@ Sin clonar el repo ni correr Vite. El expediente queda en tu equipo (SQLite 3). 
 | --- | --- |
 | **Windows** (x64) | [Descargar instalador](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-win-x64-setup.exe) |
 | **Linux** (x64) | [Descargar AppImage](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-linux-x64.AppImage) |
+| **macOS** (Apple Silicon) | [Descargar .dmg](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-mac-arm64.dmg) |
+| **macOS** (Intel) | [Descargar .dmg](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-mac-x64.dmg) |
 
 En Linux: `chmod +x ViaticoCero-linux-x64.AppImage && ./ViaticoCero-linux-x64.AppImage`.
+
+En Mac el instalador no está firmado con Apple Developer: la primera vez, clic derecho → **Abrir**. No hay binario universal (QVAC es por arquitectura).
 
 También hay un `.deb` y un `.exe` portable en la [página de releases](https://github.com/Abraham2106/vIA-tico/releases/latest). Qwen Instruct se carga después, desde Ajustes, si quieres postproceso en este equipo.
 
@@ -68,6 +72,7 @@ npm run desktop:web         # centro de excepciones en Vite (localhost:5173)
 npm run desktop:dev         # Electron en desarrollo
 npm run desktop:dist:linux  # AppImage + .deb en apps/desktop/release/
 npm run desktop:dist:win    # instalador NSIS (mejor en Windows)
+npm run desktop:dist:mac    # .dmg arm64 + x64 (hace falta un Mac)
 ```
 
 Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy no está cableado.
