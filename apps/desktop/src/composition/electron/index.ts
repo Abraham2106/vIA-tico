@@ -7,10 +7,18 @@ import {
 } from '../../adapters/driven/qvac-llm/index.ts'
 import { openNodeSqlite } from '../../adapters/driven/persistence/open-node.ts'
 import { assembleDesktopWorkspace, type DesktopRuntime } from '../assemble-workspace.ts'
+import { resolveQvacConfigPath } from '../qvac-config-path.ts'
 
 export function applyElectronQvacConfigPath(env: NodeJS.ProcessEnv = process.env): string {
-  const configPath = fileURLToPath(new URL('../../../config/qvac/qvac.config.json', import.meta.url))
-  env.QVAC_CONFIG_PATH ??= configPath
+  const unpackagedPath = fileURLToPath(
+    new URL('../../../config/qvac/qvac.config.json', import.meta.url),
+  )
+  env.QVAC_CONFIG_PATH = resolveQvacConfigPath({
+    packaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+    unpackagedPath,
+    override: env.QVAC_CONFIG_PATH,
+  })
   return env.QVAC_CONFIG_PATH
 }
 

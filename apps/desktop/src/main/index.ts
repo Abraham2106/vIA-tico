@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { IPC_CHANNELS } from '../adapters/driving/ipc/index.ts'
 import { qvacControllerOf, workspaceToApi } from '../adapters/driving/renderer-bridge/index.ts'
 import { createElectronWorkspace } from '../composition/electron/index.ts'
+import { resolveQvacConfigPath } from '../composition/qvac-config-path.ts'
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('no-sandbox')
@@ -11,9 +12,12 @@ if (process.platform === 'linux') {
 let closing = false
 
 async function createWindow() {
-  process.env.QVAC_CONFIG_PATH ??= fileURLToPath(
-    new URL('../../config/qvac/qvac.config.json', import.meta.url),
-  )
+  process.env.QVAC_CONFIG_PATH = resolveQvacConfigPath({
+    packaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+    unpackagedPath: fileURLToPath(new URL('../../config/qvac/qvac.config.json', import.meta.url)),
+    override: process.env.QVAC_CONFIG_PATH,
+  })
   const { workspace, storageInfo } = await createElectronWorkspace()
   const api = workspaceToApi(workspace, storageInfo)
   const controller = qvacControllerOf(workspace)

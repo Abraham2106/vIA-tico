@@ -1,0 +1,37 @@
+appId: cr.viaticocero.desktop
+productName: ViaticoCero
+copyright: ViáticoCero
+asar: false
+directories:
+  output: release
+files:
+  - dist/**/*
+  - package.json
+  - node_modules/**/*
+  - '!**/{CHANGELOG.md,README.md,readme.md,*.map}'
+  - '!**/node_modules/*/{test,tests,__tests__,example,examples}/**'
+extraResources:
+  - from: config/qvac
+    to: qvac
+win:
+  executableName: ViaticoCero
+  target:
+    - nsis
+    - portable
+nsis:
+  oneClick: true
+  perMachine: false
+  shortcutName: ViáticoCero
+  artifactName: ViaticoCero-win-${arch}-setup.${ext}
+portable:
+  artifactName: ViaticoCero-win-${arch}.${ext}
+linux:
+  executableName: viaticocero
+  category: Office
+  target:
+    - AppImage
+    - deb
+  artifactName: ViaticoCero-linux-${arch}.${ext}
+appImage:
+  artifactName: ViaticoCero-linux-${arch}.AppImage
+npmRebuild: false

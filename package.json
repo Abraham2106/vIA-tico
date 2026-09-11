@@ -19,6 +19,8 @@
     "desktop:web": "npm run dev:web --workspace=@viaticocero/desktop",
     "desktop:build:web": "npm run build:web --workspace=@viaticocero/desktop",
     "desktop:dev": "npm run dev --workspace=@viaticocero/desktop",
+    "desktop:dist:linux": "npm run dist:linux --workspace=@viaticocero/desktop",
+    "desktop:dist:win": "npm run dist:win --workspace=@viaticocero/desktop",
     "mobile:start": "npm run start --workspace=@viaticocero/mobile"
   },
   "engines": {

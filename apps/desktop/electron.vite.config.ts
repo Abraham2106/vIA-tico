@@ -24,14 +24,22 @@ const aliases = [
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [
+      externalizeDepsPlugin({
+        exclude: ['@viaticocero/core', '@viaticocero/contracts', '@viaticocero/ui-tokens'],
+      }),
+    ],
     resolve: { alias: aliases },
     build: {
       outDir: 'dist/main',
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [
+      externalizeDepsPlugin({
+        exclude: ['@viaticocero/core', '@viaticocero/contracts', '@viaticocero/ui-tokens'],
+      }),
+    ],
     build: {
       outDir: 'dist/preload',
     },

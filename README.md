@@ -10,6 +10,19 @@ No es «una IA que lee facturas». No es «una IA que reemplaza al contador». S
 
 Este repositorio ya tiene el **producto no-QVAC**: workspaces, contratos, motor de reglas, centro de excepciones, liquidación, export e inbox DTO. VisionPsy / Qwen / Hyperswarm quedan como **puertos** (`IVisionInference`, `ILanguageModel`, `IQvacProvider`) sin cablear el SDK. Justificación en [`Docs/`](./Docs/README.md).
 
+## Instalar el escritorio
+
+Sin clonar el repo ni correr Vite. El expediente queda en tu equipo (SQLite 3). No hay cuenta ni servidor.
+
+| Sistema | Instalador |
+| --- | --- |
+| **Windows** (x64) | [Descargar instalador](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-win-x64-setup.exe) |
+| **Linux** (x64) | [Descargar AppImage](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-linux-x64.AppImage) |
+
+En Linux: `chmod +x ViaticoCero-linux-x64.AppImage && ./ViaticoCero-linux-x64.AppImage`.
+
+También hay un `.deb` y un `.exe` portable en la [página de releases](https://github.com/Abraham2106/vIA-tico/releases/latest). Qwen Instruct se carga después, desde Ajustes, si quieres postproceso en este equipo.
+
 ## Por qué QVAC tiene que estar
 
 El documento financiero no puede salir a una API de visión. Las reglas no comprenden un ticket térmico ni un «almorcé con el cliente». Quitar VisionPsy rompe la captura on-device; quitar el validador convertiría una predicción en verdad financiera.
@@ -51,7 +64,10 @@ Detalle: [`Docs/00-producto.md`](./Docs/00-producto.md) (tesis + cuña, 18 punto
 npm install
 npm test
 npm run typecheck
-npm run desktop:web   # centro de excepciones en Vite (localhost:5173)
+npm run desktop:web         # centro de excepciones en Vite (localhost:5173)
+npm run desktop:dev         # Electron en desarrollo
+npm run desktop:dist:linux  # AppImage + .deb en apps/desktop/release/
+npm run desktop:dist:win    # instalador NSIS (mejor en Windows)
 ```
 
 Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy no está cableado.
