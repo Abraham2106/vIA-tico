@@ -154,7 +154,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
         <p className="cds--label-01">Inbox: {snapshot.pairing.inboxUrl ?? 'local'}</p>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button kind="secondary" size="sm" onClick={() => void copyPairingCode()}>
-            {copyState === 'copied' ? 'Código copiado' : 'Copiar código'}
+            {copyState === 'copied' ? 'Código en portapapeles' : 'Copiar código'}
           </Button>
           <Button kind="ghost" size="sm" onClick={() => void rotate()}>
             Rotar código
@@ -162,7 +162,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
         </div>
         {copyState === 'error' ? (
           <p className="cds--label-01" role="status" style={{ marginTop: '0.5rem' }}>
-            No se pudo copiar. Selecciona el código y cópialo manualmente.
+            No se pudo copiar. Selecciona el código y usa Ctrl+C.
           </p>
         ) : null}
       </OptionsTile>

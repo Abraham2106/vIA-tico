@@ -18,15 +18,13 @@ Fuentes oficiales de QVAC y tutoriales Tether.
 | [e2e electron/main.ts](https://github.com/tetherto/qvac/blob/main/packages/sdk/e2e/tests/electron/main.ts) | `no-sandbox` |
 | Commit [6536b03](https://github.com/tetherto/qvac/commit/6536b0329c5adb3737adc079cdf86dc2722b79f1) | `QvacForgePlugin` |
 
-## Productos que ya combinan hexagonal / P2P / Expo
+## Hexágono, P2P y Expo
 
-| Recurso | Uso | Qué no |
-| --- | --- | --- |
-| [Helldez/JarvisQ](https://github.com/Helldez/JarvisQ) | core platform-free; SDK sin fachada; desktop + móvil | Voz, SDK 0.9, un solo `src/` |
-| [Helldez/Resonance DESKTOP.md](https://github.com/Helldez/Resonance/blob/main/docs/DESKTOP.md) | mismo hexágono, worker Bare por target | su P2P de agentes |
-| [edycutjong/beacon](https://github.com/edycutjong/beacon) | QR pairing; provider en laptop; `delegate` | vision SmolVLM; UI desktop mínima |
+- [Helldez/JarvisQ](https://github.com/Helldez/JarvisQ): core platform-free; SDK sin fachada; desktop + móvil.
+- [Helldez/Resonance DESKTOP.md](https://github.com/Helldez/Resonance/blob/main/docs/DESKTOP.md): hexágono y worker Bare por target.
+- [edycutjong/beacon](https://github.com/edycutjong/beacon): QR pairing y `delegate` en laptop.
 
-## Tutorial → carpetas nuestras
+## Tutorial Tether → carpetas
 
 | Origen | ViáticoCero |
 | --- | --- |

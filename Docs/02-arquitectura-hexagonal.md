@@ -70,7 +70,7 @@ Pantallas Expo Router (`apps/mobile/app/{capture,motive,preview,pairing}`): foto
 ## Arquitectura de referencia
 
 - [JarvisQ](https://github.com/Helldez/JarvisQ): core platform-free, SDK directo, adaptadores por target. Pin `@qvac/sdk@0.18.2`.
-- [Beacon](https://github.com/edycutjong/beacon): pairing QR + provider. Nosotros priorizamos el DTO hacia la **app** desktop.
+- [Beacon](https://github.com/edycutjong/beacon): pairing QR + provider. El expediente viaja por DTO hacia la **app** desktop.
 
 ## Límites
 
