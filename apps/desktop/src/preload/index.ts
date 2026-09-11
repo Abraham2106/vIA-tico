@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC_CHANNELS } from '../adapters/driving/ipc/index.ts'
+import type { QvacLlmProgress } from '../ports/desktop-api.ts'
 
 const api = {
   snapshot: () => ipcRenderer.invoke(IPC_CHANNELS.snapshot),
@@ -14,6 +15,15 @@ const api = {
   pairing: () => ipcRenderer.invoke(IPC_CHANNELS.pairing),
   rotatePairing: () => ipcRenderer.invoke(IPC_CHANNELS.rotatePairing),
   qvacStatus: () => ipcRenderer.invoke(IPC_CHANNELS.qvacStatus),
+  loadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacLoad),
+  unloadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacUnload),
+  onQvacProgress: (listener: (progress: QvacLlmProgress) => void) => {
+    const wrapped = (_event: unknown, progress: QvacLlmProgress) => listener(progress)
+    ipcRenderer.on(IPC_CHANNELS.qvacProgress, wrapped)
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.qvacProgress, wrapped)
+    }
+  },
 }
 
 contextBridge.exposeInMainWorld('viatico', api)

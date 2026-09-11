@@ -1,16 +1,22 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import { IPC_CHANNELS } from '../adapters/driving/ipc/index.ts'
+import { qvacControllerOf, workspaceToApi } from '../adapters/driving/renderer-bridge/index.ts'
 import { createElectronWorkspace } from '../composition/electron/index.ts'
-import { workspaceToApi } from '../adapters/driving/renderer-bridge/index.ts'
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('no-sandbox')
 }
 
+let closing = false
+
 async function createWindow() {
+  process.env.QVAC_CONFIG_PATH ??= fileURLToPath(
+    new URL('../../config/qvac/qvac.config.json', import.meta.url),
+  )
   const workspace = await createElectronWorkspace()
   const api = workspaceToApi(workspace)
+  const controller = qvacControllerOf(workspace)
 
   ipcMain.handle(IPC_CHANNELS.snapshot, () => api.snapshot())
   ipcMain.handle(IPC_CHANNELS.registerTrip, (_e, input) => api.registerTrip(input))
@@ -24,6 +30,8 @@ async function createWindow() {
   ipcMain.handle(IPC_CHANNELS.pairing, () => api.pairing())
   ipcMain.handle(IPC_CHANNELS.rotatePairing, () => api.rotatePairing())
   ipcMain.handle(IPC_CHANNELS.qvacStatus, () => api.qvacStatus())
+  ipcMain.handle(IPC_CHANNELS.qvacLoad, () => api.loadQwen())
+  ipcMain.handle(IPC_CHANNELS.qvacUnload, () => api.unloadQwen())
 
   const window = new BrowserWindow({
     width: 1280,
@@ -35,11 +43,26 @@ async function createWindow() {
     },
   })
 
+  controller?.setProgressListener?.((snapshot) => {
+    if (!window.isDestroyed()) {
+      window.webContents.send(IPC_CHANNELS.qvacProgress, snapshot)
+    }
+  })
+
   if (process.env.ELECTRON_RENDERER_URL) {
     await window.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
     await window.loadFile(fileURLToPath(new URL('../renderer/index.html', import.meta.url)))
   }
+
+  app.on('before-quit', (event) => {
+    if (closing || !controller?.close) return
+    event.preventDefault()
+    closing = true
+    void controller.close().finally(() => {
+      app.quit()
+    })
+  })
 }
 
 app.whenReady().then(() => {
