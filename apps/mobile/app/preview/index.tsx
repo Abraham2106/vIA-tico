@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { router } from 'expo-router'
 import { draftToJob, getDraft } from '../../src/state/draft'
 import { ShareFileJobTransport } from '../../src/adapters/driven/transport'
 import { HttpJobTransport } from '../../src/adapters/driven/transport'
 import { getPairing } from '../pairing/state'
 import { CATEGORY_LABELS, confidenceFill, confidenceTone, formatDisplayDate } from '@viaticocero/ui-tokens'
+import { AppEmptyState } from '../../src/components/AppEmptyState'
+import { FocusablePressable } from '../../src/components/FocusablePressable'
 import { useAppTheme } from '../../src/theme'
 
 export default function PreviewScreen() {
@@ -12,6 +15,7 @@ export default function PreviewScreen() {
   const draft = getDraft()
   const job = draftToJob()
   const [message, setMessage] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
   const styles = makeStyles(theme)
   const tone = confidenceTone(draft.dto.confianza_lectura)
   const fill = confidenceFill(draft.dto.confianza_lectura)
@@ -19,11 +23,14 @@ export default function PreviewScreen() {
     tone === 'high' ? theme.colors.success : tone === 'medium' ? theme.colors.warning : theme.colors.error
 
   async function sendShare() {
+    setSending(true)
     try {
       await new ShareFileJobTransport().send(job)
       setMessage('Job listo para compartir')
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setSending(false)
     }
   }
 
@@ -33,11 +40,14 @@ export default function PreviewScreen() {
       setMessage('Configura inbox URL en Emparejar')
       return
     }
+    setSending(true)
     try {
       await new HttpJobTransport(pairing.inboxUrl).send(job)
       setMessage('Enviado al inbox del escritorio')
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setSending(false)
     }
   }
 
@@ -49,6 +59,14 @@ export default function PreviewScreen() {
       <Text style={styles.copy}>
         Esto es lo que el escritorio ingesta. VisionPsy no autoriza; core decide el veredicto.
       </Text>
+      {!draft.imagePath ? (
+        <AppEmptyState
+          title="Sin imagen adjunta"
+          subtitle="Captura el comprobante para que VisionPsy lea el ticket. Puedes enviar el DTO igual."
+          actionLabel="Ir a capturar"
+          onAction={() => router.push('/capture')}
+        />
+      ) : null}
       <View style={styles.card}>
         <Row k="Proveedor" v={draft.dto.proveedor || '—'} styles={styles} />
         <Row k="Fecha" v={formatDisplayDate(draft.dto.fecha)} styles={styles} />
@@ -74,13 +92,28 @@ export default function PreviewScreen() {
       <Text selectable style={styles.json}>
         {JSON.stringify(job, null, 2)}
       </Text>
-      <Pressable style={styles.primary} onPress={() => void sendShare()} accessibilityLabel="Compartir JSON">
+      {sending ? <ActivityIndicator color={theme.colors.interactive} accessibilityLabel="Enviando job" /> : null}
+      <FocusablePressable
+        style={styles.primary}
+        onPress={() => void sendShare()}
+        disabled={sending}
+        accessibilityLabel="Compartir JSON"
+      >
         <Text style={styles.primaryText}>Compartir JSON</Text>
-      </Pressable>
-      <Pressable style={styles.secondary} onPress={() => void sendHttp()} accessibilityLabel="Enviar al inbox del escritorio">
+      </FocusablePressable>
+      <FocusablePressable
+        style={styles.secondary}
+        onPress={() => void sendHttp()}
+        disabled={sending}
+        accessibilityLabel="Enviar al inbox del escritorio"
+      >
         <Text style={styles.secondaryText}>POST al inbox</Text>
-      </Pressable>
-      {message ? <Text style={styles.meta}>{message}</Text> : null}
+      </FocusablePressable>
+      {message ? (
+        <Text style={styles.meta} accessibilityLiveRegion="polite">
+          {message}
+        </Text>
+      ) : null}
     </ScrollView>
   )
 }
@@ -107,8 +140,8 @@ function Row({
 function makeStyles(theme: ReturnType<typeof useAppTheme>) {
   return StyleSheet.create({
     wrap: { padding: theme.space[4], gap: theme.space[3] },
-    title: { color: theme.colors.text, fontSize: 22, lineHeight: 28, fontWeight: '600' },
-    copy: { color: theme.colors.muted, fontSize: 14, lineHeight: 20 },
+    title: { color: theme.colors.text, ...theme.type.display },
+    copy: { color: theme.colors.muted, ...theme.type.body },
     card: {
       backgroundColor: theme.colors.raised,
       borderRadius: theme.radius.lg,
@@ -116,16 +149,16 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       gap: 10,
       borderWidth: 1,
       borderColor: theme.colors.border,
+      ...theme.elevation.card,
     },
     row: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
     k: {
       color: theme.colors.muted,
-      fontSize: 11,
-      fontWeight: '500',
       textTransform: 'uppercase',
       letterSpacing: 0.5,
+      ...theme.type.caption,
     },
-    v: { color: theme.colors.text, flexShrink: 1, textAlign: 'right', fontSize: 14 },
+    v: { color: theme.colors.text, flexShrink: 1, textAlign: 'right', ...theme.type.body },
     confidence: { gap: 6 },
     track: {
       height: 8,
@@ -134,8 +167,8 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       overflow: 'hidden',
     },
     fill: { height: 8, borderRadius: 999 },
-    hint: { color: theme.colors.tertiary, fontSize: 12, lineHeight: 16 },
-    json: { color: theme.colors.brand, fontFamily: 'monospace', fontSize: 12 },
+    hint: { color: theme.colors.tertiary, ...theme.type.bodySmall },
+    json: { color: theme.colors.brand, fontFamily: 'monospace', ...theme.type.bodySmall },
     primary: {
       backgroundColor: theme.colors.interactive,
       borderRadius: theme.radius.md,
@@ -143,7 +176,7 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       minHeight: 48,
       justifyContent: 'center',
     },
-    primaryText: { color: '#FFFFFF', fontWeight: '600', textAlign: 'center' },
+    primaryText: { color: theme.colors.inverse, textAlign: 'center', ...theme.type.subheading, fontWeight: '600' },
     secondary: {
       borderColor: theme.colors.border,
       borderWidth: 1,
@@ -152,7 +185,7 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       minHeight: 48,
       justifyContent: 'center',
     },
-    secondaryText: { color: theme.colors.text, textAlign: 'center', fontWeight: '500' },
-    meta: { color: theme.colors.warning },
+    secondaryText: { color: theme.colors.text, textAlign: 'center', ...theme.type.subheading },
+    meta: { color: theme.colors.warning, ...theme.type.body },
   })
 }

@@ -13,7 +13,10 @@ export class SystemClock implements IClock {
 }
 
 export class FixedClock implements IClock {
-  constructor(private value: string) {}
+  private value: string
+  constructor(value: string) {
+    this.value = value
+  }
   nowIso(): string {
     return this.value
   }
@@ -97,7 +100,10 @@ export class JsonReportExporter implements IReportExporter {
 }
 
 export class ManualVision implements IVisionInference {
-  constructor(private readonly result: VisionResult) {}
+  private readonly result: VisionResult
+  constructor(result: VisionResult) {
+    this.result = result
+  }
   status() {
     return 'ready' as const
   }

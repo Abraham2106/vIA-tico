@@ -57,11 +57,11 @@ WCAG 2.1 AA: contraste de tokens, color nunca como único indicador (icono o tex
 
 | Superficie | Qué hay |
 | --- | --- |
-| Tokens | `packages/ui-tokens` (fechas, categorías, confianza; color sobre todo para móvil) |
-| Desktop | Carbon UI Shell, IBM Products PageHeader / SidePanel / EmptyState / OptionsTile |
-| Móvil | theme hook, chips de categoría con color, preview con banda de confianza |
+| Tokens | `packages/ui-tokens`: color, space, radius, type.scale, elevation, `pressedStyle`; fechas, categorías, confianza |
+| Desktop | Carbon UI Shell, IBM Products PageHeader / SidePanel / EmptyState / OptionsTile; `--cds-interactive` desde tokens.css |
+| Móvil | `useAppTheme`, `FocusablePressable` (foco + pressed), `AppEmptyState`, chips de categoría, preview con banda de confianza y elevation |
 
-No instalar ahora: react-native-paper, Reanimated, Storybook. Eso es fase posterior (cámara guía, processing state, ExceptionCard dedicado).
+No instalar ahora: react-native-paper, Reanimated, Storybook. Eso es fase posterior (cámara guía, processing state, ExceptionCard dedicado). No hay badge de notificaciones: no hay push.
 
 ## Anti-patrones (producto)
 

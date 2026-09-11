@@ -20,12 +20,13 @@ export const tokens = {
       default: { light: '#E8ECF1', dark: '#0C0E12' } satisfies Dual,
       raised: { light: '#FFFFFF', dark: '#161A22' } satisfies Dual,
       sunken: { light: '#F1F4F8', dark: '#0A0C10' } satisfies Dual,
+      header: { light: '#0A1628', dark: '#111827' } satisfies Dual,
       inverse: { light: '#0F1720', dark: '#F9FAFB' } satisfies Dual,
     },
     content: {
       primary: { light: '#111827', dark: '#F9FAFB' } satisfies Dual,
-      secondary: { light: '#6B7280', dark: '#9CA3AF' } satisfies Dual,
-      tertiary: { light: '#9CA3AF', dark: '#6B7280' } satisfies Dual,
+      secondary: { light: '#4B5563', dark: '#9CA3AF' } satisfies Dual,
+      tertiary: { light: '#6B7280', dark: '#9CA3AF' } satisfies Dual,
       inverse: { light: '#FFFFFF', dark: '#111827' } satisfies Dual,
       brand: { light: '#1A56DB', dark: '#60A5FA' } satisfies Dual,
     },
@@ -73,7 +74,22 @@ export const tokens = {
       medium: 'Inter',
       semibold: 'Inter',
       bold: 'Inter',
+      mono: 'IBM Plex Mono',
     },
+    scale: {
+      display: { size: 22, weight: '600', lineHeight: 28 },
+      heading: { size: 16, weight: '600', lineHeight: 22 },
+      subheading: { size: 14, weight: '500', lineHeight: 20 },
+      body: { size: 14, weight: '400', lineHeight: 20 },
+      bodySmall: { size: 12, weight: '400', lineHeight: 16 },
+      caption: { size: 11, weight: '500', lineHeight: 14 },
+      mono: { size: 14, weight: '400', lineHeight: 20 },
+    },
+  },
+  elevation: {
+    low: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    medium: '0 4px 6px rgba(0, 0, 0, 0.07)',
+    high: '0 10px 15px rgba(0, 0, 0, 0.1)',
   },
   space: {
     0: 0,
@@ -102,6 +118,7 @@ export const tokens = {
     normal: 200,
     slow: 300,
     progress: 400,
+    pressedOpacity: 0.72,
   },
 } as const
 
@@ -146,6 +163,11 @@ export function categoryColor(category: ReceiptCategory | undefined, mode: Color
 
 export function pick(dual: Dual, mode: ColorMode): string {
   return dual[mode]
+}
+
+/** Mobile pressed feedback. Desktop uses Carbon layer-active. */
+export function pressedStyle(pressed: boolean): { opacity: number } | null {
+  return pressed ? { opacity: tokens.motion.pressedOpacity } : null
 }
 
 export function feedbackForVerdict(verdict: 'PROCEDE' | 'REVISION' | 'NO_PROCEDE'): FeedbackTone {

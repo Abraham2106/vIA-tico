@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { getPairing, setPairing } from './state'
+import { FocusablePressable } from '../../src/components/FocusablePressable'
 import { useAppTheme } from '../../src/theme'
 
 export default function PairingScreen() {
@@ -41,10 +42,14 @@ export default function PairingScreen() {
         placeholderTextColor={theme.colors.tertiary}
         accessibilityLabel="URL del inbox del escritorio"
       />
-      <Pressable style={styles.primary} onPress={save} accessibilityLabel="Guardar emparejamiento">
+      <FocusablePressable style={styles.primary} onPress={save} accessibilityLabel="Guardar emparejamiento">
         <Text style={styles.primaryText}>Guardar pairing</Text>
-      </Pressable>
-      {saved ? <Text style={styles.ok}>Guardado. El envío usa IJobTransport DTO.</Text> : null}
+      </FocusablePressable>
+      {saved ? (
+        <Text style={styles.ok} accessibilityLiveRegion="polite">
+          Guardado. El envío usa IJobTransport DTO.
+        </Text>
+      ) : null}
     </View>
   )
 }
@@ -52,13 +57,12 @@ export default function PairingScreen() {
 function makeStyles(theme: ReturnType<typeof useAppTheme>) {
   return StyleSheet.create({
     wrap: { flex: 1, padding: theme.space[4], gap: 10 },
-    copy: { color: theme.colors.muted, marginBottom: 8, fontSize: 14, lineHeight: 20 },
+    copy: { color: theme.colors.muted, marginBottom: 8, ...theme.type.body },
     label: {
       color: theme.colors.muted,
-      fontSize: 11,
-      fontWeight: '500',
       textTransform: 'uppercase',
       letterSpacing: 0.5,
+      ...theme.type.caption,
     },
     input: {
       borderColor: theme.colors.border,
@@ -77,7 +81,7 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       marginTop: 8,
       justifyContent: 'center',
     },
-    primaryText: { color: '#FFFFFF', fontWeight: '600', textAlign: 'center' },
-    ok: { color: theme.colors.success },
+    primaryText: { color: theme.colors.inverse, textAlign: 'center', ...theme.type.subheading, fontWeight: '600' },
+    ok: { color: theme.colors.success, ...theme.type.body },
   })
 }

@@ -103,3 +103,77 @@ body {
     margin-left: 0;
   }
 }
+
+/* ============================================================
+   ViáticoCero — Brand Unification Override (Opción A)
+   Unifica --cds-interactive al azul de ui-tokens.
+   Fichero de referencia: Docs/brand-override.css / Docs/11-spec-cursor-ui.md
+   ============================================================ */
+
+.vz-theme {
+  --cds-interactive: var(--interactive-default);
+  --cds-interactive-hover: var(--interactive-hover);
+  --cds-interactive-active: var(--interactive-pressed);
+  --cds-interactive-focus: var(--interactive-default);
+  --cds-interactive-disabled: var(--interactive-disabled);
+}
+
+.cds--g90 .vz-theme {
+  --cds-interactive-focus: var(--content-brand);
+}
+
+/* ---- Spacing tokens (P2 spec) ---- */
+:root {
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;   /* = --cds-spacing-05 (1rem) */
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;   /* = --cds-spacing-07 (2rem) */
+  --space-10: 40px;
+  --space-12: 48px;  /* = --cds-spacing-09 (3rem) */
+  --space-16: 64px;
+}
+
+/* ---- Radius tokens (P2 spec) ---- */
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+/* ---- Focus visible fallback (accesibilidad P0) ---- */
+.vz-theme *:focus-visible {
+  outline: 2px solid var(--cds-interactive-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Disabled state para componentes manuales (P1) ---- */
+.vz-theme .vz-disabled,
+.vz-theme [aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.vz-verdict--revision.cds--tag {
+  background: var(--feedback-warning-bg);
+  color: var(--feedback-warning);
+  border-color: var(--feedback-warning);
+}
+
+.vz-category-chip.cds--tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.vz-category-chip__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}

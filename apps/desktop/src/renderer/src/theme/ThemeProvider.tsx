@@ -34,6 +34,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   )
   const [dark, setDark] = useState(() => (typeof window === 'undefined' ? false : systemDark()))
 
+  const carbonTheme = toCarbon(preference, dark)
+
   useEffect(() => {
     localStorage.setItem(THEME_STORAGE_KEY, preference)
     const media = window.matchMedia('(prefers-color-scheme: dark)')
@@ -43,7 +45,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => media.removeEventListener('change', onChange)
   }, [preference])
 
-  const carbonTheme = toCarbon(preference, dark)
+  useEffect(() => {
+    document.documentElement.dataset.theme = carbonTheme === 'g90' ? 'dark' : 'light'
+  }, [carbonTheme])
 
   const value = useMemo(
     () => ({
@@ -56,7 +60,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <Theme theme={carbonTheme} className="vz-theme">
+      <Theme
+        theme={carbonTheme}
+        className="vz-theme"
+        data-theme={carbonTheme === 'g90' ? 'dark' : 'light'}
+      >
         {children}
       </Theme>
     </ThemeContext.Provider>
