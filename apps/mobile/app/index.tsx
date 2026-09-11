@@ -1,21 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { Link, router } from 'expo-router'
+import { Link, router, useFocusEffect } from 'expo-router'
 import { ensureDemoTrip, getMobileWorkspace } from '../src/composition/expo'
 import { DEMO_TRIP } from '@viaticocero/core'
 import { formatDisplayDate } from '@viaticocero/ui-tokens'
 import { AppEmptyState } from '../src/components/AppEmptyState'
 import { FocusablePressable } from '../src/components/FocusablePressable'
+import { hasCaptureDraft } from '../src/state/draft'
 import { useAppTheme } from '../src/theme'
 
 export default function HomeScreen() {
   const theme = useAppTheme()
   const [visionStatus, setVisionStatus] = useState('…')
+  const [draftReady, setDraftReady] = useState(hasCaptureDraft())
 
   useEffect(() => {
     void ensureDemoTrip()
     setVisionStatus(getMobileWorkspace().deps.vision.status())
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      setDraftReady(hasCaptureDraft())
+    }, []),
+  )
 
   const styles = makeStyles(theme)
 
@@ -27,8 +35,8 @@ export default function HomeScreen() {
         {formatDisplayDate(DEMO_TRIP.startDate)} – {formatDisplayDate(DEMO_TRIP.endDate)}
       </Text>
       <Text style={styles.copy} accessibilityLiveRegion="polite">
-        Foto → VisionPsy on-device → revisión → analysis-job al escritorio. Estado del
-        adaptador: {visionStatus}. El celular no liquida.
+        Foto → VisionPsy on-device → motivo libre → revisión → analysis-job al escritorio.
+        Estado del adaptador: {visionStatus}. El celular no liquida.
       </Text>
       {visionStatus === 'unavailable' || visionStatus === 'not-wired' ? (
         <AppEmptyState
@@ -47,6 +55,17 @@ export default function HomeScreen() {
           <Text style={styles.primaryText}>Capturar comprobante</Text>
         </FocusablePressable>
       </Link>
+      {draftReady ? (
+        <Link href="/motive" asChild>
+          <FocusablePressable
+            style={styles.secondary}
+            accessibilityRole="button"
+            accessibilityLabel="Declarar motivo del gasto"
+          >
+            <Text style={styles.secondaryText}>Declarar motivo</Text>
+          </FocusablePressable>
+        </Link>
+      ) : null}
       <Link href="/preview" asChild>
         <FocusablePressable style={styles.secondary} accessibilityRole="button" accessibilityLabel="Ver preview y enviar">
           <Text style={styles.secondaryText}>Ver preview / enviar</Text>

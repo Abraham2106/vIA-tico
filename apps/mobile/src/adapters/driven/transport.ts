@@ -2,13 +2,17 @@ import * as Sharing from 'expo-sharing'
 import { File, Paths } from 'expo-file-system'
 import type { AnalysisJob } from '@viaticocero/contracts'
 import type { IJobTransport } from '@viaticocero/core'
+import { inboxJobHeaders } from './inbox-headers.ts'
 
 export class HttpJobTransport implements IJobTransport {
-  constructor(private readonly inboxUrl: string) {}
+  constructor(
+    private readonly inboxUrl: string,
+    private readonly pairingCode?: string,
+  ) {}
   async send(job: AnalysisJob): Promise<void> {
     const response = await fetch(`${this.inboxUrl.replace(/\/$/, '')}/jobs`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: inboxJobHeaders(this.pairingCode),
       body: JSON.stringify(job),
     })
     if (!response.ok) {

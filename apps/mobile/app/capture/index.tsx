@@ -71,7 +71,7 @@ export default function CaptureScreen() {
     }
   }
 
-  function goPreview() {
+  function goMotive() {
     const current = getDraft().dto
     setDraft({
       imagePath: imagePath || undefined,
@@ -84,7 +84,7 @@ export default function CaptureScreen() {
         raw_text: current.raw_text || `${proveedor} ${fecha} ${monto}`.trim(),
       },
     })
-    router.push('/preview')
+    router.push('/motive')
   }
 
   return (
@@ -166,8 +166,8 @@ export default function CaptureScreen() {
       ) : null}
       <FocusablePressable
         style={styles.primary}
-        onPress={goPreview}
-        accessibilityLabel="Usar estos datos y revisar"
+        onPress={goMotive}
+        accessibilityLabel="Usar estos datos y declarar motivo"
       >
         <Text style={styles.primaryText}>Revisar gasto</Text>
       </FocusablePressable>
