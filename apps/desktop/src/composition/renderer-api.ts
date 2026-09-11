@@ -7,6 +7,8 @@ let apiPromise: Promise<DesktopApi> | undefined
 /** Composition boundary for the web preview; renderer consumes only DesktopApi. */
 export async function getRendererApi(): Promise<DesktopApi> {
   if (window.viatico) return window.viatico
-  if (!apiPromise) apiPromise = createWebWorkspace().then(workspaceToApi)
+  if (!apiPromise) {
+    apiPromise = createWebWorkspace().then(({ workspace, storageInfo }) => workspaceToApi(workspace, storageInfo))
+  }
   return apiPromise
 }

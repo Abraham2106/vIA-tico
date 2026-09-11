@@ -35,6 +35,10 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 4173,
   },
+  optimizeDeps: {
+    exclude: ['sql.js'],
+  },
+  assetsInclude: ['**/*.wasm'],
   build: {
     outDir: fileURLToPath(new URL('./dist/renderer', import.meta.url)),
     emptyOutDir: true,

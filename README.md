@@ -42,6 +42,7 @@ Detalle: [`Docs/00-producto.md`](./Docs/00-producto.md) (tesis + cuña, 18 punto
 - TypeScript, `@qvac/sdk@0.18.2` — sin inferencia cloud
 - Móvil: Expo ≥ 54 + VisionPsy Nano (local). **No Flutter** (ADR 0009)
 - Escritorio: electron-vite + Qwen3-4B-Instruct (postproceso + clasificar motivo) + Bare
+- Expediente: SQLite 3 en el equipo (Electron: archivo en userData; preview web: sql.js + IndexedDB). No hay backend HTTP.
 - Autoridad: código (schema, dígitos, duplicados, contexto del documento, política, conciliación)
 
 ## Cómo correr (sin modelos)
@@ -55,7 +56,7 @@ npm run desktop:web   # centro de excepciones en Vite (localhost:5173)
 
 Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy no está cableado.
 
-El escritorio siembra el viaje demo Liberia 10–14 sep (6 PROCEDE + 2 REVISIÓN).
+El escritorio siembra el viaje demo Liberia 10–14 sep (6 PROCEDE + 2 REVISIÓN) **solo si SQLite está vacío**. Recargar no borra viajes ni excepciones. Detalle: [`Docs/12-persistencia-sqlite.md`](./Docs/12-persistencia-sqlite.md).
 
 ## Cómo se trabaja
 

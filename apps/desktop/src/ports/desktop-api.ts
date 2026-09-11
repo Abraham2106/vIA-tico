@@ -28,6 +28,13 @@ export type QvacDesktopStatus = {
   progress?: QvacLlmProgress
 }
 
+export type StorageInfo = {
+  engine: 'sqlite3'
+  location: 'file' | 'indexeddb' | 'memory'
+  driver: 'node:sqlite' | 'sql.js'
+  path?: string
+}
+
 /** Renderer-facing port exposed by preload; it contains no adapter details. */
 export type DesktopApi = {
   snapshot(): Promise<WorkspaceSnapshot>
@@ -41,6 +48,7 @@ export type DesktopApi = {
   updatePolicy(patch: Partial<Policy>): Promise<Policy>
   pairing(): Promise<PairingPayload>
   rotatePairing(): Promise<PairingPayload>
+  storageInfo(): Promise<StorageInfo>
   qvacStatus(): Promise<QvacDesktopStatus>
   loadQwen(): Promise<QvacDesktopStatus>
   unloadQwen(): Promise<QvacDesktopStatus>

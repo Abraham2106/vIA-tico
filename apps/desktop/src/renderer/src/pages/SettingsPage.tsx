@@ -15,7 +15,7 @@ import type { Policy, WorkspaceSnapshot } from '@viaticocero/core'
 import type { ThemePreference } from '@viaticocero/ui-tokens'
 import { PageScaffold } from '../components/PageScaffold'
 import { useTheme } from '../theme/ThemeProvider'
-import type { DesktopApi, QvacDesktopStatus } from '../../../ports/desktop-api.ts'
+import type { DesktopApi, QvacDesktopStatus, StorageInfo } from '../../../ports/desktop-api.ts'
 
 type Props = {
   snapshot: WorkspaceSnapshot
@@ -41,6 +41,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
   const [actionError, setActionError] = useState<string | null>(null)
   const [pairingCode, setPairingCode] = useState(snapshot.pairing.pairingCode)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+  const [storage, setStorage] = useState<StorageInfo | null>(null)
 
   const refreshQvac = useCallback(async () => {
     setQvacLoading(true)
@@ -52,6 +53,10 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
     } finally {
       setQvacLoading(false)
     }
+  }, [api])
+
+  useEffect(() => {
+    void api.storageInfo().then(setStorage).catch(() => setStorage(null))
   }, [api])
 
   useEffect(() => {
@@ -165,6 +170,34 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
             No se pudo copiar. Selecciona el código y usa Ctrl+C.
           </p>
         ) : null}
+      </OptionsTile>
+
+      <OptionsTile
+        title="Expediente"
+        summary={
+          storage?.location === 'file'
+            ? 'SQLite 3 en este equipo'
+            : storage?.location === 'indexeddb'
+              ? 'SQLite 3 en IndexedDB'
+              : 'SQLite 3'
+        }
+        open
+      >
+        <p className="cds--label-01">
+          No hay servidor ni base en la nube. Viajes, comprobantes y excepciones viven en SQLite 3
+          {storage?.location === 'file'
+            ? ' (archivo local de Electron).'
+            : ' compilado a WASM en este preview; Electron usa el mismo esquema en un archivo .sqlite.'}
+        </p>
+        {storage?.path ? (
+          <p className="vz-num" style={{ marginTop: '0.5rem', wordBreak: 'break-all' }}>
+            {storage.path}
+          </p>
+        ) : (
+          <p className="cds--label-01" style={{ marginTop: '0.5rem' }}>
+            Motor: {storage?.driver ?? 'sqlite3'} · ubicación: {storage?.location ?? '…'}
+          </p>
+        )}
       </OptionsTile>
 
       <OptionsTile title="Tema" summary={preference} open>

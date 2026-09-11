@@ -1,7 +1,9 @@
 import { QvacLanguageModelStub } from '../adapters/driven/qvac-llm/stub.ts'
-import { createDesktopWorkspace } from './desktop-workspace.ts'
+import { openWebSqlite } from '../adapters/driven/persistence/open-web.ts'
+import { assembleDesktopWorkspace } from './assemble-workspace.ts'
 
-/** Preview Vite: sin Bare ni @qvac/sdk. */
+/** Preview Vite: sin Bare ni @qvac/sdk. Expediente SQLite en IndexedDB. */
 export async function createWebWorkspace() {
-  return createDesktopWorkspace(new QvacLanguageModelStub())
+  const opened = await openWebSqlite()
+  return assembleDesktopWorkspace(new QvacLanguageModelStub(), opened)
 }

@@ -4,8 +4,9 @@ import type {
   DesktopApi,
   QvacDesktopStatus,
   QvacLlmProgress,
+  StorageInfo,
 } from '../../../ports/desktop-api.ts'
-export type { DesktopApi, QvacDesktopStatus, QvacLlmProgress } from '../../../ports/desktop-api.ts'
+export type { DesktopApi, QvacDesktopStatus, QvacLlmProgress, StorageInfo } from '../../../ports/desktop-api.ts'
 
 type QvacController = {
   snapshot(): QvacLlmProgress
@@ -43,7 +44,7 @@ function statusOf(workspace: Workspace): QvacDesktopStatus {
   }
 }
 
-export function workspaceToApi(workspace: Workspace): DesktopApi {
+export function workspaceToApi(workspace: Workspace, storageInfo: StorageInfo): DesktopApi {
   return {
     snapshot: () => workspace.snapshot(),
     registerTrip: (input) => workspace.registerTrip(input),
@@ -56,6 +57,7 @@ export function workspaceToApi(workspace: Workspace): DesktopApi {
     updatePolicy: (patch) => workspace.updatePolicy(patch),
     pairing: () => workspace.pairDevices.getPayload(),
     rotatePairing: () => workspace.pairDevices.rotate(),
+    storageInfo: async () => storageInfo,
     qvacStatus: async () => statusOf(workspace),
     async loadQwen() {
       const model = workspace.deps.languageModel

@@ -1,9 +1,12 @@
+import { join } from 'node:path'
+import { app } from 'electron'
 import { fileURLToPath } from 'node:url'
 import {
   createSdkCompletionRuntime,
   QvacLanguageModel,
 } from '../../adapters/driven/qvac-llm/index.ts'
-import { createDesktopWorkspace } from '../desktop-workspace.ts'
+import { openNodeSqlite } from '../../adapters/driven/persistence/open-node.ts'
+import { assembleDesktopWorkspace, type DesktopRuntime } from '../assemble-workspace.ts'
 
 export function applyElectronQvacConfigPath(env: NodeJS.ProcessEnv = process.env): string {
   const configPath = fileURLToPath(new URL('../../../config/qvac/qvac.config.json', import.meta.url))
@@ -11,11 +14,15 @@ export function applyElectronQvacConfigPath(env: NodeJS.ProcessEnv = process.env
   return env.QVAC_CONFIG_PATH
 }
 
-export async function createElectronWorkspace() {
+export function defaultSqlitePath(): string {
+  return process.env.VIATICOCERO_SQLITE ?? join(app.getPath('userData'), 'viaticocero.sqlite')
+}
+
+export async function createElectronWorkspace(): Promise<DesktopRuntime> {
   applyElectronQvacConfigPath()
   const languageModel = new QvacLanguageModel({
     runtime: createSdkCompletionRuntime(),
   })
-  const workspace = await createDesktopWorkspace(languageModel)
-  return workspace
+  const opened = await openNodeSqlite(defaultSqlitePath())
+  return assembleDesktopWorkspace(languageModel, opened)
 }

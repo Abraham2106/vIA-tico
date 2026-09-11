@@ -14,6 +14,7 @@ const api = {
   updatePolicy: (patch: unknown) => ipcRenderer.invoke(IPC_CHANNELS.updatePolicy, patch),
   pairing: () => ipcRenderer.invoke(IPC_CHANNELS.pairing),
   rotatePairing: () => ipcRenderer.invoke(IPC_CHANNELS.rotatePairing),
+  storageInfo: () => ipcRenderer.invoke(IPC_CHANNELS.storageInfo),
   qvacStatus: () => ipcRenderer.invoke(IPC_CHANNELS.qvacStatus),
   loadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacLoad),
   unloadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacUnload),

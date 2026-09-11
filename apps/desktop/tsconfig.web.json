@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
+    "types": ["vite/client", "node"],
     "paths": {
       "@viaticocero/contracts": ["../../packages/contracts/index.ts"],
       "@viaticocero/core": ["../../packages/core/index.ts"],
@@ -12,12 +13,14 @@
     "src/renderer/**/*.ts",
     "src/renderer/**/*.tsx",
     "src/composition/web.ts",
-    "src/composition/desktop-workspace.ts",
+    "src/composition/assemble-workspace.ts",
     "src/adapters/**/*.ts",
     "vite.config.ts"
   ],
   "exclude": [
     "src/adapters/driven/qvac-llm/sdk-runtime.ts",
+    "src/adapters/driven/persistence/node-session.ts",
+    "src/adapters/driven/persistence/open-node.ts",
     "src/composition/electron/**",
     "src/composition/bare/**"
   ]

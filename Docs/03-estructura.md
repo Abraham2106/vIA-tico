@@ -55,7 +55,7 @@ vIA-tico/
 │   │   │   ├── renderer/src/
 │   │   │   │   ├── features/{inbox,exceptions,audit,receipts,trips,settlements,export}/
 │   │   │   │   └── {assets,components,hooks,pages,styles}/
-│   │   │   ├── adapters/driven/{qvac-llm,qvac-provider,exporters/{pdf,csv,xlsx,json},filesystem,persistence,clock}/
+│   │   │   ├── adapters/driven/{qvac-llm,qvac-provider,exporters/{pdf,csv,xlsx,json},filesystem,persistence (SQLite 3),clock}/
 │   │   │   ├── adapters/driving/{ipc,renderer-bridge}/
 │   │   │   └── composition/{electron,bare}/
 │   │   ├── config/qvac/ | qvac/

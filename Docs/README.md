@@ -18,7 +18,8 @@ El hexágono, los contratos y las apps (sin motor QVAC) ya están en el árbol. 
 | [07-autoridad-pipeline.md](./07-autoridad-pipeline.md) | Schema, motivo sin veredicto, dígitos, política |
 | [08-demo-evals.md](./08-demo-evals.md) | Demo ⚠ de la cuña, golden set, tracks |
 | [09-ui-ux.md](./09-ui-ux.md) | Desktop Carbon / IBM Products; móvil tokens; IA UX |
-| [adr/](./adr/) | 0001–0009 runtime; 0010–0014 producto |
+| [12-persistencia-sqlite.md](./12-persistencia-sqlite.md) | Auditoría del expediente: no hay backend HTTP; SQLite 3 local |
+| [adr/](./adr/) | 0001–0009 runtime; 0010–0015 producto |
 
 ## Producto (una línea)
 

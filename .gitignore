@@ -23,3 +23,7 @@ apps/mobile/qvac/worker.entry.mjs
 apps/mobile/qvac/addons.manifest.json
 .idea/
 .vscode/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm

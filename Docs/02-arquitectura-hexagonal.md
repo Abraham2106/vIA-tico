@@ -33,7 +33,7 @@ desktop: ingest → postproceso lingüístico
 | `IQvacProvider` | `apps/desktop/.../qvac-provider` | `startQVACProvider()` — **opcional** |
 | `ICamera` | `apps/mobile/.../camera` | Expo |
 | `IFileSystem` | cada app | Nano exige `attachments[].path` en disco |
-| `IReceiptStore` | desktop (registro); móvil puede cachear | SQLite / JSON local |
+| `IReceiptStore` | desktop (registro); móvil puede cachear | SQLite 3 local (ADR 0015) |
 | `IReportExporter` | `apps/desktop/.../exporters/{pdf,csv,xlsx,json}` | solo escritorio |
 | `IAuditLog` | desktop persistencia | eventos `audit-event` |
 | `IClock` | ambas | reloj de sistema |
@@ -45,7 +45,7 @@ El dominio habla de *hechos de un recibo*, *motivo*, *excepciones* y *liquidar u
 1. El usuario dispara en Android. El adaptador de cámara deja un archivo en disco.
 2. `analyze-receipt` llama `IVisionInference` (una imagen; Base si el ticket es denso). Sale un DTO de `packages/contracts/vision-result` (schema + confianza + RAW).
 3. `pair-devices` ya emparejó. `IJobTransport` entrega un `analysis-job`.
-4. Electron persiste con `ingest-vision-result`. El postproceso (`analyze-with-llm`) es lingüístico; el validador de dígitos puede descartarlo.
+4. Electron persiste el `analysis-job` en SQLite 3 local (`ingest-vision-result`). El postproceso (`analyze-with-llm`) es lingüístico; el validador de dígitos puede descartarlo.
 5. Si hay texto de motivo, `classify-motive` produce categoría + confianza (sin veredicto).
 6. `validate-policy` + `detect-duplicates` + confianza emiten `verdict`. `record-audit` deja el rastro.
 7. UI: **centro de excepciones**, conciliación, auditoría. `export-report` por `IReportExporter`.

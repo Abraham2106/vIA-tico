@@ -23,7 +23,7 @@ Features UI: `exceptions` (primaria), `audit`, `inbox`, `receipts`, `trips`, `se
 ## Proceso main
 
 - Composition root (`composition/electron`).
-- Adaptadores: `qvac-llm`, `qvac-provider`, `persistence`, `filesystem`, `exporters/{pdf,csv,xlsx,json}`.
+- Adaptadores: `qvac-llm`, `qvac-provider`, `persistence` (SQLite 3), `filesystem`, `exporters/{pdf,csv,xlsx,json}`.
 - IPC (`adapters/driving/ipc`) → casos de uso de `packages/core`.
 - Linux: `app.commandLine.appendSwitch('no-sandbox')` / `electron-vite dev -- --no-sandbox`.
 

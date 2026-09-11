@@ -14,8 +14,8 @@ async function createWindow() {
   process.env.QVAC_CONFIG_PATH ??= fileURLToPath(
     new URL('../../config/qvac/qvac.config.json', import.meta.url),
   )
-  const workspace = await createElectronWorkspace()
-  const api = workspaceToApi(workspace)
+  const { workspace, storageInfo } = await createElectronWorkspace()
+  const api = workspaceToApi(workspace, storageInfo)
   const controller = qvacControllerOf(workspace)
 
   ipcMain.handle(IPC_CHANNELS.snapshot, () => api.snapshot())
@@ -29,6 +29,7 @@ async function createWindow() {
   ipcMain.handle(IPC_CHANNELS.updatePolicy, (_e, patch) => api.updatePolicy(patch))
   ipcMain.handle(IPC_CHANNELS.pairing, () => api.pairing())
   ipcMain.handle(IPC_CHANNELS.rotatePairing, () => api.rotatePairing())
+  ipcMain.handle(IPC_CHANNELS.storageInfo, () => api.storageInfo())
   ipcMain.handle(IPC_CHANNELS.qvacStatus, () => api.qvacStatus())
   ipcMain.handle(IPC_CHANNELS.qvacLoad, () => api.loadQwen())
   ipcMain.handle(IPC_CHANNELS.qvacUnload, () => api.unloadQwen())
