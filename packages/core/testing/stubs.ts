@@ -1,4 +1,4 @@
-import type { VisionResult } from '@viaticocero/contracts'
+import type { MotiveClassification, VisionResult } from '@viaticocero/contracts'
 import type { IClock } from '../application/ports/outbound/clock.ts'
 import type { IIdGenerator } from '../application/ports/outbound/ids.ts'
 import type { ILanguageModel } from '../application/ports/outbound/language-model.ts'
@@ -40,6 +40,9 @@ export class UnwiredLanguageModel implements ILanguageModel {
   }
   async refine(extraction: VisionResult): Promise<VisionResult> {
     return extraction
+  }
+  async classifyMotive(): Promise<MotiveClassification> {
+    throw new Error('ILanguageModel: classify-motive requiere Qwen Instruct cableado')
   }
 }
 

@@ -10,6 +10,7 @@ import type { CoreDeps } from './ports/outbound/workspace.ts'
 import { createAnalyzeReceipt } from './use-cases/analyze-receipt/index.ts'
 import { createAnalyzeWithLlm } from './use-cases/analyze-with-llm/index.ts'
 import { createAttachReceipt } from './use-cases/attach-receipt/index.ts'
+import { createClassifyMotive } from './use-cases/classify-motive/index.ts'
 import { createExportReport } from './use-cases/export-report/index.ts'
 import { createIngestVisionResult } from './use-cases/ingest-vision-result/index.ts'
 import { createPairDevices } from './use-cases/pair-devices/index.ts'
@@ -29,6 +30,7 @@ export function createWorkspace(deps: CoreDeps) {
   const resolveException = createResolveException(deps)
   const analyzeReceipt = createAnalyzeReceipt(deps.vision)
   const analyzeWithLlm = createAnalyzeWithLlm(deps.languageModel)
+  const classifyMotive = createClassifyMotive(deps.languageModel)
 
   return {
     deps,
@@ -44,6 +46,8 @@ export function createWorkspace(deps: CoreDeps) {
     analyzeReceipt: (input: { imagePath: string; profile?: 'base' | 'flash' }) =>
       analyzeReceipt.execute(input),
     analyzeWithLlm: (extraction: VisionResult) => analyzeWithLlm.execute(extraction),
+    classifyMotive: (input: { motivo?: string; extraction?: VisionResult }) =>
+      classifyMotive.execute(input),
     async registerTraveler(input: { id?: string; name: string; email?: string }) {
       const traveler = createTraveler({
         id: input.id ?? deps.ids.next(),

@@ -1,4 +1,4 @@
-import type { VisionResult } from '@viaticocero/contracts'
+import type { MotiveClassification, VisionResult } from '@viaticocero/contracts'
 import type { AuditEntry } from '../shared/audit.ts'
 import type { EntityId } from '../shared/ids.ts'
 import type { FiredRule } from '../shared/rules.ts'
@@ -19,6 +19,7 @@ export type Receipt = {
   sourceJobId?: string
   extraction: VisionResult
   linguisticPostprocess?: VisionResult
+  motiveClassification?: MotiveClassification
   usedExtraction: VisionResult
   verdict: Verdict
   triggeredRules: FiredRule[]

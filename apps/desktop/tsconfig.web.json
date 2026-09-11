@@ -11,8 +11,14 @@
   "include": [
     "src/renderer/**/*.ts",
     "src/renderer/**/*.tsx",
-    "src/composition/**/*.ts",
+    "src/composition/web.ts",
+    "src/composition/desktop-workspace.ts",
     "src/adapters/**/*.ts",
     "vite.config.ts"
+  ],
+  "exclude": [
+    "src/adapters/driven/qvac-llm/sdk-runtime.ts",
+    "src/composition/electron/**",
+    "src/composition/bare/**"
   ]
 }

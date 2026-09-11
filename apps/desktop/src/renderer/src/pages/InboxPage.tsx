@@ -4,7 +4,7 @@ import { parseAnalysisJob } from '@viaticocero/contracts'
 import { type WorkspaceSnapshot } from '@viaticocero/core'
 import { AppEmptyState } from '../components/AppEmptyState'
 import { PageScaffold } from '../components/PageScaffold'
-import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
+import type { DesktopApi } from '../../../ports/desktop-api.ts'
 
 type Props = {
   snapshot: WorkspaceSnapshot

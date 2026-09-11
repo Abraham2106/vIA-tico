@@ -10,6 +10,7 @@ export const RULE_CODES = [
   'TOPE_ALIMENTACION_DIA',
   'TOPE_HOSPEDAJE',
   'MOTIVO_AMBIGUO',
+  'CONFIANZA_CLASIFICACION',
   'DOCUMENTO_ILEGIBLE',
   'MONEDA_DISTINTA_POLITICA',
 ] as const
@@ -36,6 +37,7 @@ export const RULE_LABELS: Record<RuleCode, string> = {
   TOPE_ALIMENTACION_DIA: 'Tope diario de alimentación',
   TOPE_HOSPEDAJE: 'Tope de hospedaje por noche',
   MOTIVO_AMBIGUO: 'Motivo ambiguo',
+  CONFIANZA_CLASIFICACION: 'Confianza de clasificación baja o media',
   DOCUMENTO_ILEGIBLE: 'Documento ilegible',
   MONEDA_DISTINTA_POLITICA: 'Moneda distinta a la política',
 }

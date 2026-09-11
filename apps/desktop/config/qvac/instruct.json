@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "catalogId": "QWEN3_4B_INST_Q4_K_M",
+  "modelType": "llamacpp-completion",
+  "forbiddenCatalogIds": ["QWEN3_4B_Q4_K_M"],
+  "modelConfig": {
+    "ctx_size": 4096
+  },
+  "generation": {
+    "temp": 0,
+    "predict": 2048,
+    "seed": 42
+  },
+  "timeouts": {
+    "loadMs": 600000,
+    "inferMs": 120000
+  },
+  "preload": false
+}

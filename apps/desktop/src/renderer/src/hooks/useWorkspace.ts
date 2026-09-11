@@ -1,17 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { WorkspaceSnapshot } from '@viaticocero/core'
-import { workspaceToApi, type DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
-import { createWebWorkspace } from '../../../composition/web.ts'
-
-let apiPromise: Promise<DesktopApi> | undefined
-
-async function getApi(): Promise<DesktopApi> {
-  if (window.viatico) return window.viatico
-  if (!apiPromise) {
-    apiPromise = createWebWorkspace().then(workspaceToApi)
-  }
-  return apiPromise
-}
+import { getRendererApi } from '../../../composition/renderer-api.ts'
+import type { DesktopApi } from '../../../ports/desktop-api.ts'
 
 export function useWorkspace() {
   const [snapshot, setSnapshot] = useState<WorkspaceSnapshot | null>(null)
@@ -19,7 +9,7 @@ export function useWorkspace() {
   const [api, setApi] = useState<DesktopApi | null>(null)
 
   const reload = useCallback(async () => {
-    const client = await getApi()
+    const client = await getRendererApi()
     setApi(client)
     setSnapshot(await client.snapshot())
   }, [])

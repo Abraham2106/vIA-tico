@@ -8,6 +8,7 @@
   "exports": {
     ".": "./index.ts",
     "./vision-result": "./vision-result/index.ts",
+    "./motive-classification": "./motive-classification/index.ts",
     "./analysis-job": "./analysis-job/index.ts",
     "./pairing": "./pairing/index.ts",
     "./export-formats": "./export-formats/index.ts"

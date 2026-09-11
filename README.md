@@ -70,6 +70,6 @@ apps/mobile           captura + motivo + VisionPsy
 Docs/                 tesis (00) y ADRs
 ```
 
-## Base preexistente
+## SDK
 
-Repo original de este hackathon. No hay producto previo ni fork. El scaffold (hexágono, monorepo, skills) es trabajo de este equipo sobre `@qvac/sdk@0.18.2` y los tutoriales oficiales de Tether. JarvisQ / Beacon se citan solo como **forma** (puertos, pairing), no como código copiado.
+`@qvac/sdk@0.18.2`. Tutoriales oficiales de Tether para Electron y Expo.

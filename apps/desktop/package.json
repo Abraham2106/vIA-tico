@@ -21,6 +21,7 @@
     "@carbon/react": "^1.116.0",
     "@carbon/themes": "^11.81.0",
     "@carbon/type": "^11.67.0",
+    "@qvac/sdk": "0.18.2",
     "@ibm/plex": "^6.4.1",
     "@viaticocero/contracts": "0.1.0",
     "@viaticocero/core": "0.1.0",

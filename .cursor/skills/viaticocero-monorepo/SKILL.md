@@ -9,7 +9,7 @@ description: >
 
 # Trabajar en el monorepo ViáticoCero
 
-Un Git, **cinco paquetes**. Dos artefactos de usuario (APK + app Electron). El hexágono no se copia.
+Un Git, **cinco paquetes**. Dos artefactos de usuario (APK + app Electron). El hexágono vive en `packages/core`.
 
 ## Mapa
 

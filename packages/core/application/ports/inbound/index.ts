@@ -2,6 +2,7 @@ import type {
   AnalysisJob,
   ExportArtifact,
   ExportFormat,
+  MotiveClassification,
   PairingPayload,
   PairedDevice,
   VisionResult,
@@ -55,6 +56,17 @@ export interface IIngestVisionResult {
 
 export interface IAnalyzeWithLlm {
   execute(extraction: VisionResult): Promise<{ used: VisionResult; discarded: boolean; refined?: VisionResult }>
+}
+
+export interface IClassifyMotive {
+  execute(input: {
+    motivo?: string
+    extraction?: Pick<VisionResult, 'proveedor' | 'tipo_documento' | 'raw_text'>
+  }): Promise<{
+    classification?: MotiveClassification
+    skipped: boolean
+    extraRules: import('../../../domain/shared/rules.ts').FiredRule[]
+  }>
 }
 
 export interface IValidateExtraction {

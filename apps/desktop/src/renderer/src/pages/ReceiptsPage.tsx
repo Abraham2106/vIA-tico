@@ -25,7 +25,7 @@ import { ConfidenceBar } from '../components/ConfidenceBar'
 import { PageScaffold } from '../components/PageScaffold'
 import { VerdictPill } from '../components/VerdictPill'
 import { toIsoDate } from '../lib/isoDate'
-import type { DesktopApi } from '../../../adapters/driving/renderer-bridge/index.ts'
+import type { DesktopApi } from '../../../ports/desktop-api.ts'
 
 type Props = {
   snapshot: WorkspaceSnapshot

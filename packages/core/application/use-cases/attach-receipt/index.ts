@@ -7,10 +7,12 @@ import type { AttachReceiptInput } from '../../ports/inbound/index.ts'
 import type { CoreDeps } from '../../ports/outbound/workspace.ts'
 import { validateExtraction } from '../validate-extraction/index.ts'
 import { createAnalyzeWithLlm } from '../analyze-with-llm/index.ts'
+import { createClassifyMotive } from '../classify-motive/index.ts'
 import { createOpenException } from '../open-exception/index.ts'
 
 export function createAttachReceipt(deps: CoreDeps) {
   const analyzeWithLlm = createAnalyzeWithLlm(deps.languageModel)
+  const classifyMotive = createClassifyMotive(deps.languageModel)
   const openException = createOpenException(deps)
 
   return {
@@ -40,11 +42,29 @@ export function createAttachReceipt(deps: CoreDeps) {
         })
       }
 
+      const classified = await classifyMotive.execute({
+        motivo: guarded.used.motivo,
+        extraction: guarded.used,
+      })
+      extraRules.push(...classified.extraRules)
+
+      let usedExtraction = guarded.used
+      if (
+        classified.classification &&
+        classified.classification.confianza_clasificacion === 'alta' &&
+        !usedExtraction.categoria
+      ) {
+        usedExtraction = {
+          ...usedExtraction,
+          categoria: classified.classification.categoria,
+        }
+      }
+
       const siblings = await deps.receipts.listByTrip(trip.id)
       const policy = await deps.policy.getActive()
       const evaluation = evaluateReceipt({
         trip,
-        extraction: guarded.used,
+        extraction: usedExtraction,
         policy,
         siblings,
         extraRules,
@@ -59,13 +79,24 @@ export function createAttachReceipt(deps: CoreDeps) {
         sourceJobId: input.sourceJobId,
         extraction,
         linguisticPostprocess: llm.refined,
-        usedExtraction: guarded.used,
+        motiveClassification: classified.classification,
+        usedExtraction,
         verdict: evaluation.verdict,
         triggeredRules: evaluation.rules,
         audit: [
           audit(now, 'vision', 'extract', `confianza=${extraction.confianza_lectura}`),
           ...(llm.refined
             ? [audit(now, 'llm', llm.discarded ? 'postprocess-discarded' : 'postprocess', undefined)]
+            : []),
+          ...(classified.classification
+            ? [
+                audit(
+                  now,
+                  'llm',
+                  'classify-motive',
+                  `${classified.classification.categoria}/${classified.classification.confianza_clasificacion}`,
+                ),
+              ]
             : []),
           audit(now, 'system', 'verdict', evaluation.verdict),
         ],

@@ -17,7 +17,7 @@ La investigación proponía un design system para una app única de viáticos (t
 | FAB «nueva liquidación» como héroe | La cola de trabajo es **excepciones abiertas** |
 | Instalar react-native-paper / Reanimated ahora | No. Tokens + componentes actuales. Paper no es el producto |
 
-Sí se adopta la dirección **datos primero** en el escritorio vía **Carbon for IBM Products** (Plex, g10/g90, UI Shell, PageHeader, SidePanel, DataTable). El móvil no copia Carbon: tokens + Expo. IA transparente sin chatbot, offline como estado normal.
+Sí se adopta la dirección **datos primero** en el escritorio vía **Carbon for IBM Products** (Plex, g10/g90, UI Shell, PageHeader, SidePanel, DataTable). El móvil usa tokens + Expo, sin Carbon. IA transparente sin chatbot, offline como estado normal.
 
 ## Principios
 
@@ -69,6 +69,6 @@ No instalar ahora: react-native-paper, Reanimated, Storybook. Eso es fase poster
 - Chatbot de IA
 - Glassmorphism / gradientes / neon
 - Inventar un kit visual paralelo en desktop (Carbon ya es el sistema)
-- Copiar un template de Paper en el móvil
+- Template de Paper en el móvil
 - Banner «sin conexión» en un flujo que ya es local
 - Tres tabs de liquidación en el teléfono

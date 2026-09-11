@@ -67,10 +67,10 @@ QVAC no entra al renderer. La UI no es un log de tokens.
 
 Pantallas Expo Router (`apps/mobile/app/{capture,motive,preview,pairing}`): foto, motivo libre, preview del DTO, envío. Sin PDF ni política pesada en el teléfono.
 
-## Referencias de forma (no de feature)
+## Arquitectura de referencia
 
-- [JarvisQ](https://github.com/Helldez/JarvisQ): core platform-free, SDK directo, adaptadores por target. No copiamos voz ni SDK 0.9.
-- [Beacon](https://github.com/edycutjong/beacon): pairing QR + provider. Nosotros priorizamos el DTO hacia la **app** desktop.
+- [JarvisQ](https://github.com/Helldez/JarvisQ): core platform-free, SDK directo, adaptadores por target. Pin `@qvac/sdk@0.18.2`.
+- [Beacon](https://github.com/edycutjong/beacon): pairing QR + provider. El expediente viaja por DTO hacia la **app** desktop.
 
 ## Límites
 

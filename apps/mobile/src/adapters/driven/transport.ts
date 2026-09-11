@@ -30,6 +30,6 @@ export class ShareFileJobTransport implements IJobTransport {
       })
       return
     }
-    throw new Error('Sharing no disponible; copia el JSON desde preview')
+    throw new Error('Sharing no disponible; exporta el JSON desde preview')
   }
 }
