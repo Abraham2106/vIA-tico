@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 import { networkInterfaces } from 'node:os'
-import { parseAnalysisJob, type AnalysisJob } from '@viaticocero/contracts'
+import { parseAnalysisJob, type AnalysisJob } from '../../../../../../packages/contracts/index.ts'
 
 const DEFAULT_PORT = 47_821
 const MAX_PORT_OFFSET = 4
