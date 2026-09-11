@@ -14,18 +14,20 @@ Este repositorio ya tiene el **producto no-QVAC**: workspaces, contratos, motor 
 
 Sin clonar el repo ni correr Vite. El expediente queda en tu equipo (SQLite 3). No hay cuenta ni servidor.
 
-| Sistema | Instalador |
+**[Descargar instaladores (Releases)](https://github.com/Abraham2106/vIA-tico/releases)** — si esa lista está vacía, el primer empaquetado todavía corre en [Actions → Desktop installers](https://github.com/Abraham2106/vIA-tico/actions/workflows/desktop-installers.yml). Los enlaces `/download/…` dan 404 hasta que ese job termina.
+
+| Sistema | Archivo en Releases |
 | --- | --- |
-| **Windows** (x64) | [Descargar instalador](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-win-x64-setup.exe) |
-| **Linux** (x64) | [Descargar AppImage](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-linux-x64.AppImage) |
-| **macOS** (Apple Silicon) | [Descargar .dmg](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-mac-arm64.dmg) |
-| **macOS** (Intel) | [Descargar .dmg](https://github.com/Abraham2106/vIA-tico/releases/latest/download/ViaticoCero-mac-x64.dmg) |
+| **Windows** (x64) | `ViaticoCero-win-x64-setup.exe` |
+| **Linux** (x64) | `ViaticoCero-linux-x64.AppImage` |
+| **macOS** (Apple Silicon) | `ViaticoCero-mac-arm64.dmg` |
+| **macOS** (Intel) | `ViaticoCero-mac-x64.dmg` |
 
 En Linux: `chmod +x ViaticoCero-linux-x64.AppImage && ./ViaticoCero-linux-x64.AppImage`.
 
 En Mac el instalador no está firmado con Apple Developer: la primera vez, clic derecho → **Abrir**. No hay binario universal (QVAC es por arquitectura).
 
-También hay un `.deb` y un `.exe` portable en la [página de releases](https://github.com/Abraham2106/vIA-tico/releases/latest). Qwen Instruct se carga después, desde Ajustes, si quieres postproceso en este equipo.
+También se publica un `.deb` y un `.exe` portable. Qwen Instruct se carga después, desde Ajustes, si quieres postproceso en este equipo.
 
 ## Por qué QVAC tiene que estar
 
