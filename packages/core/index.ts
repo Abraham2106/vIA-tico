@@ -1,5 +1,6 @@
 export type {
   AnalysisJob,
+  AuditEvent,
   ExportArtifact,
   ExportFormat,
   PairingPayload,
@@ -37,6 +38,7 @@ export * from './application/use-cases/settle-trip/index.ts'
 export * from './application/use-cases/export-report/index.ts'
 export * from './application/use-cases/pair-devices/index.ts'
 export * from './application/use-cases/resolve-exception.ts'
+export * from './application/use-cases/record-audit/index.ts'
 export * from './testing/memory-store.ts'
 export * from './testing/stubs.ts'
 export * from './testing/demo-fixtures.ts'

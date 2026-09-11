@@ -2,8 +2,12 @@ import { audit } from '../../domain/shared/audit.ts'
 import type { ExceptionCase } from '../../domain/exception/index.ts'
 import type { ResolveExceptionInput } from '../ports/inbound/index.ts'
 import type { CoreDeps } from '../ports/outbound/workspace.ts'
+import { createRecordAudit } from './record-audit/index.ts'
 
-export function createResolveException(deps: Pick<CoreDeps, 'clock' | 'exceptions' | 'receipts'>) {
+export function createResolveException(
+  deps: Pick<CoreDeps, 'clock' | 'ids' | 'exceptions' | 'receipts' | 'auditLog'>,
+) {
+  const recordAudit = createRecordAudit(deps)
   return {
     async execute(input: ResolveExceptionInput): Promise<ExceptionCase> {
       const item = await deps.exceptions.get(input.exceptionId)
@@ -19,10 +23,20 @@ export function createResolveException(deps: Pick<CoreDeps, 'clock' | 'exception
           resolution: { action: 'keep', note: input.note, at: now, by: input.by },
         }
         await deps.exceptions.save(kept)
+        await recordAudit.write({
+          at: now,
+          actor: 'human',
+          action: 'keep-exception',
+          detail: input.note,
+          receiptId: receipt.id,
+          tripId: item.tripId,
+          exceptionId: item.id,
+        })
         return kept
       }
 
       const verdict = input.action === 'approve' ? 'PROCEDE' : 'NO_PROCEDE'
+      const humanEntry = audit(now, 'human', input.action, input.note)
       await deps.receipts.save({
         ...receipt,
         humanDecision: {
@@ -31,7 +45,7 @@ export function createResolveException(deps: Pick<CoreDeps, 'clock' | 'exception
           decidedAt: now,
           decidedBy: input.by,
         },
-        audit: [...receipt.audit, audit(now, 'human', input.action, input.note)],
+        audit: [...receipt.audit, humanEntry],
       })
 
       const resolved: ExceptionCase = {
@@ -40,6 +54,12 @@ export function createResolveException(deps: Pick<CoreDeps, 'clock' | 'exception
         resolution: { action: input.action, note: input.note, at: now, by: input.by },
       }
       await deps.exceptions.save(resolved)
+      await recordAudit.write({
+        ...humanEntry,
+        receiptId: receipt.id,
+        tripId: item.tripId,
+        exceptionId: item.id,
+      })
       return resolved
     },
   }

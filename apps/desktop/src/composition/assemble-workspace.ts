@@ -43,6 +43,7 @@ export async function assembleDesktopWorkspace(
     exceptions: repos.exceptions,
     jobs: repos.jobs,
     pairing: repos.pairing,
+    auditLog: repos.auditLog,
     languageModel,
     vision: new UnwiredVision(),
     exporter: new DesktopReportExporter(),

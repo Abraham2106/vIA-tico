@@ -1,4 +1,4 @@
-import type { AnalysisJob, PairedDevice, PairingPayload } from '@viaticocero/contracts'
+import type { AnalysisJob, AuditEvent, PairedDevice, PairingPayload } from '@viaticocero/contracts'
 import type { MotiveClassification, VisionResult } from '@viaticocero/contracts'
 import {
   DEFAULT_POLICY,
@@ -13,6 +13,7 @@ import {
   type SerializedMemory,
 } from '@viaticocero/core'
 import type {
+  IAuditLog,
   IExceptionRepository,
   IJobInbox,
   IPairingStore,
@@ -33,6 +34,7 @@ export type SqliteRepositories = {
   exceptions: IExceptionRepository
   jobs: IJobInbox
   pairing: IPairingStore
+  auditLog: IAuditLog
 }
 
 type CountRow = { n: number }
@@ -77,6 +79,16 @@ type ExceptionRow = {
 }
 type JobRow = { payload_json: string }
 type DeviceRow = { payload_json: string }
+type AuditRow = {
+  id: string
+  at: string
+  actor: AuditEvent['actor']
+  action: string
+  detail: string | null
+  receipt_id: string | null
+  trip_id: string | null
+  exception_id: string | null
+}
 
 export function defaultPairing(nowIso: string): PairingPayload {
   return {
@@ -96,6 +108,43 @@ export function applySchema(session: SqliteSession, nowIso: string): void {
     session.run('INSERT INTO meta (key, value_json) VALUES (?, ?)', ['schema_version', writeJson(SCHEMA_VERSION)])
     session.run('INSERT INTO meta (key, value_json) VALUES (?, ?)', ['policy', writeJson(DEFAULT_POLICY)])
     session.run('INSERT INTO meta (key, value_json) VALUES (?, ?)', ['pairing', writeJson(defaultPairing(nowIso))])
+    return
+  }
+  const stored = Number(JSON.parse(version.value_json))
+  if (stored < SCHEMA_VERSION) {
+    backfillAuditEvents(session)
+    session.run(
+      `INSERT INTO meta (key, value_json) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json`,
+      ['schema_version', writeJson(SCHEMA_VERSION)],
+    )
+  }
+}
+
+function backfillAuditEvents(session: SqliteSession): void {
+  const existing = session.get<CountRow>('SELECT COUNT(*) AS n FROM audit_events')
+  if (Number(existing?.n ?? 0) > 0) return
+  const receipts = session.all<ReceiptRow>('SELECT * FROM receipts')
+  let n = 0
+  for (const row of receipts) {
+    const entries = JSON.parse(row.audit_json) as Receipt['audit']
+    for (const entry of entries) {
+      n += 1
+      session.run(
+        `INSERT INTO audit_events (id, at, actor, action, detail, receipt_id, trip_id, exception_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          `backfill-${row.id}-${n}`,
+          entry.at,
+          entry.actor,
+          entry.action,
+          asSql(entry.detail),
+          row.id,
+          row.trip_id,
+          null,
+        ],
+      )
+    }
   }
 }
 
@@ -381,7 +430,52 @@ export function createSqliteRepositories(session: SqliteSession): SqliteReposito
     },
   }
 
-  return { travelers, trips, receipts, policy, exceptions, jobs, pairing }
+  const auditLog: IAuditLog = {
+    async append(event) {
+      session.run(
+        `INSERT INTO audit_events (id, at, actor, action, detail, receipt_id, trip_id, exception_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           at = excluded.at,
+           actor = excluded.actor,
+           action = excluded.action,
+           detail = excluded.detail,
+           receipt_id = excluded.receipt_id,
+           trip_id = excluded.trip_id,
+           exception_id = excluded.exception_id`,
+        [
+          event.id,
+          event.at,
+          event.actor,
+          event.action,
+          asSql(event.detail),
+          asSql(event.receiptId),
+          asSql(event.tripId),
+          asSql(event.exceptionId),
+        ],
+      )
+      await session.persist()
+    },
+    async list(filter) {
+      const rows = filter?.receiptId
+        ? session.all<AuditRow>('SELECT * FROM audit_events WHERE receipt_id = ? ORDER BY at', [filter.receiptId])
+        : filter?.tripId
+          ? session.all<AuditRow>('SELECT * FROM audit_events WHERE trip_id = ? ORDER BY at', [filter.tripId])
+          : session.all<AuditRow>('SELECT * FROM audit_events ORDER BY at')
+      return rows.map((row) => ({
+        id: row.id,
+        at: row.at,
+        actor: row.actor,
+        action: row.action,
+        detail: row.detail ?? undefined,
+        receiptId: row.receipt_id ?? undefined,
+        tripId: row.trip_id ?? undefined,
+        exceptionId: row.exception_id ?? undefined,
+      }))
+    },
+  }
+
+  return { travelers, trips, receipts, policy, exceptions, jobs, pairing, auditLog }
 }
 
 export async function importSerialized(repos: SqliteRepositories, data: SerializedMemory): Promise<void> {
@@ -393,4 +487,5 @@ export async function importSerialized(repos: SqliteRepositories, data: Serializ
   for (const device of data.devices) await repos.pairing.saveDevice(device)
   await repos.policy.save(data.policy)
   await repos.pairing.rotateCode(data.pairing)
+  for (const event of data.auditEvents ?? []) await repos.auditLog.append(event)
 }

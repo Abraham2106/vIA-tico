@@ -1,4 +1,4 @@
-import type { AnalysisJob, PairedDevice, PairingPayload } from '@viaticocero/contracts'
+import type { AnalysisJob, AuditEvent, PairedDevice, PairingPayload } from '@viaticocero/contracts'
 import type { ExceptionCase } from '../domain/exception/index.ts'
 import { DEFAULT_POLICY, type Policy } from '../domain/policy/index.ts'
 import type { Receipt } from '../domain/receipt/index.ts'
@@ -12,6 +12,7 @@ import type {
   IReceiptRepository,
   ITravelerRepository,
   ITripRepository,
+  IAuditLog,
 } from '../application/ports/outbound/stores.ts'
 
 export type MemoryState = {
@@ -21,6 +22,7 @@ export type MemoryState = {
   exceptions: Map<string, ExceptionCase>
   jobs: Map<string, AnalysisJob>
   devices: Map<string, PairedDevice>
+  auditEvents: Map<string, AuditEvent>
   policy: Policy
   pairing: PairingPayload
 }
@@ -33,6 +35,7 @@ export function createEmptyMemoryState(nowIso: string): MemoryState {
     exceptions: new Map(),
     jobs: new Map(),
     devices: new Map(),
+    auditEvents: new Map(),
     policy: { ...DEFAULT_POLICY },
     pairing: {
       desktopDeviceId: 'desktop-local',
@@ -142,7 +145,19 @@ export function createMemoryRepositories(state: MemoryState) {
     },
   }
 
-  return { travelers, trips, receipts, policy, exceptions, jobs, pairing, state }
+  const auditLog: IAuditLog = {
+    async append(event) {
+      state.auditEvents.set(event.id, event)
+    },
+    async list(filter) {
+      return [...state.auditEvents.values()]
+        .filter((item) => (filter?.receiptId ? item.receiptId === filter.receiptId : true))
+        .filter((item) => (filter?.tripId ? item.tripId === filter.tripId : true))
+        .sort((a, b) => a.at.localeCompare(b.at))
+    },
+  }
+
+  return { travelers, trips, receipts, policy, exceptions, jobs, pairing, auditLog, state }
 }
 
 export type SerializedMemory = {
@@ -152,6 +167,7 @@ export type SerializedMemory = {
   exceptions: ExceptionCase[]
   jobs: AnalysisJob[]
   devices: PairedDevice[]
+  auditEvents?: AuditEvent[]
   policy: Policy
   pairing: PairingPayload
 }
@@ -164,6 +180,7 @@ export function serializeMemory(state: MemoryState): SerializedMemory {
     exceptions: [...state.exceptions.values()],
     jobs: [...state.jobs.values()],
     devices: [...state.devices.values()],
+    auditEvents: [...state.auditEvents.values()],
     policy: state.policy,
     pairing: state.pairing,
   }
@@ -177,6 +194,7 @@ export function hydrateMemory(data: SerializedMemory): MemoryState {
     exceptions: new Map(data.exceptions.map((item) => [item.id, item])),
     jobs: new Map(data.jobs.map((item) => [item.id, item])),
     devices: new Map(data.devices.map((item) => [item.deviceId, item])),
+    auditEvents: new Map((data.auditEvents ?? []).map((item) => [item.id, item])),
     policy: data.policy,
     pairing: data.pairing,
   }

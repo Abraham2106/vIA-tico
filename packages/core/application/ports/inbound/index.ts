@@ -1,5 +1,6 @@
 import type {
   AnalysisJob,
+  AuditEvent,
   ExportArtifact,
   ExportFormat,
   MotiveClassification,
@@ -109,4 +110,5 @@ export type WorkspaceSnapshot = {
   policy: Policy
   pairing: PairingPayload
   devices: PairedDevice[]
+  auditEvents: AuditEvent[]
 }

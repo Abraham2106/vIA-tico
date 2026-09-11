@@ -17,6 +17,7 @@ export type AppRoute =
   | 'recibir'
   | 'revisar'
   | 'liquidacion'
+  | 'auditoria'
   | 'exportar'
   | 'ajustes'
 
@@ -123,6 +124,9 @@ export function InicioPage({ snapshot, selectedTripId, onNavigate }: Props) {
             <Button onClick={() => onNavigate(next.route)}>{next.label}</Button>
             <Button kind="secondary" onClick={() => onNavigate('viajes')}>
               Cambiar o crear viaje
+            </Button>
+            <Button kind="ghost" onClick={() => onNavigate('auditoria')}>
+              Ver auditoría
             </Button>
           </div>
         </Tile>

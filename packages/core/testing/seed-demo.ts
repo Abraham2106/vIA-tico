@@ -25,6 +25,7 @@ export function createMemoryDeps(now = '2026-09-14T18:00:00.000Z'): CoreDeps & {
     exceptions: memory.exceptions,
     jobs: memory.jobs,
     pairing: memory.pairing,
+    auditLog: memory.auditLog,
     languageModel: new UnwiredLanguageModel(),
     vision: new UnwiredVision(),
     exporter: new JsonReportExporter(),

@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS meta (
@@ -69,10 +69,24 @@ CREATE TABLE IF NOT EXISTS devices (
   payload_json TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS audit_events (
+  id TEXT PRIMARY KEY,
+  at TEXT NOT NULL,
+  actor TEXT NOT NULL,
+  action TEXT NOT NULL,
+  detail TEXT,
+  receipt_id TEXT,
+  trip_id TEXT,
+  exception_id TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_trips_traveler ON trips(traveler_id);
 CREATE INDEX IF NOT EXISTS idx_receipts_trip ON receipts(trip_id);
 CREATE INDEX IF NOT EXISTS idx_exceptions_trip ON exceptions(trip_id);
 CREATE INDEX IF NOT EXISTS idx_exceptions_receipt ON exceptions(receipt_id);
 CREATE INDEX IF NOT EXISTS idx_exceptions_status ON exceptions(status);
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_audit_receipt ON audit_events(receipt_id);
+CREATE INDEX IF NOT EXISTS idx_audit_trip ON audit_events(trip_id);
+CREATE INDEX IF NOT EXISTS idx_audit_at ON audit_events(at);
 `

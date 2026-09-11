@@ -21,4 +21,4 @@ El hexágono ya tenía repositorios. El escritorio los implementaba con `Map` + 
 - Recargar Electron o el preview no re-siembra el demo si ya hay viajes.
 - `rotatePairing` y `updatePolicy` persisten porque el `save` del repositorio escribe SQLite; no hay monkey-patch de `Workspace`.
 - No se añade Postgres, SQLite en la nube, ni un `apps/api`.
-- `IAuditLog` como tabla de eventos sigue pendiente; el rastro usable hoy es `receipts.audit_json`.
+- `IAuditLog` es tabla `audit_events` (ADR 0015 enmienda). `receipts.audit_json` sigue siendo el recorte por comprobante.

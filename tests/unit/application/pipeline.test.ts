@@ -22,6 +22,9 @@ describe('pipeline de expediente (sin QVAC)', () => {
     const codes = snap.receipts.flatMap((item) => item.triggeredRules.map((rule) => rule.code))
     expect(codes).toContain('FECHA_FUERA_PERIODO')
     expect(codes).toContain('DUPLICADO')
+    expect(snap.auditEvents.length).toBeGreaterThan(0)
+    expect(snap.auditEvents.some((item) => item.action === 'verdict')).toBe(true)
+    expect(snap.auditEvents.some((item) => item.action === 'open-exception')).toBe(true)
   })
 
   it('ingesta un analysis-job y abre excepción por confianza media', async () => {
@@ -56,6 +59,13 @@ describe('pipeline de expediente (sin QVAC)', () => {
     expect(receipt.verdict).toBe('REVISION')
     const jobs = await workspace.deps.jobs.list()
     expect(jobs[0]?.status).toBe('ingested')
+    const after = await workspace.snapshot()
+    expect(after.auditEvents.some((item) => item.action === 'register-trip' && item.tripId === trip.id)).toBe(
+      true,
+    )
+    expect(after.auditEvents.some((item) => item.action === 'verdict' && item.receiptId === receipt.id)).toBe(
+      true,
+    )
   })
 
   it('descarta postproceso que altera dígitos y marca REVISIÓN', async () => {
@@ -198,6 +208,8 @@ describe('pipeline de expediente (sin QVAC)', () => {
     const settlement = await workspace.settleTrip(DEMO_TRIP.id)
     expect(settlement.revisionCount).toBe(1)
     expect(settlement.procedeCount).toBe(7)
+    const after = await workspace.snapshot()
+    expect(after.auditEvents.some((event) => event.action === 'approve' && event.actor === 'human')).toBe(true)
   })
 
   it('no cierra viaje con excepciones abiertas', async () => {

@@ -11,6 +11,7 @@ import type {
   IReceiptRepository,
   ITravelerRepository,
   ITripRepository,
+  IAuditLog,
 } from './stores.ts'
 import type { IVisionInference } from './vision.ts'
 
@@ -24,6 +25,7 @@ export type CoreDeps = {
   exceptions: IExceptionRepository
   jobs: IJobInbox
   pairing: IPairingStore
+  auditLog: IAuditLog
   languageModel: ILanguageModel
   vision: IVisionInference
   exporter: IReportExporter

@@ -9,11 +9,13 @@ import { validateExtraction } from '../validate-extraction/index.ts'
 import { createAnalyzeWithLlm } from '../analyze-with-llm/index.ts'
 import { createClassifyMotive } from '../classify-motive/index.ts'
 import { createOpenException } from '../open-exception/index.ts'
+import { createRecordAudit } from '../record-audit/index.ts'
 
 export function createAttachReceipt(deps: CoreDeps) {
   const analyzeWithLlm = createAnalyzeWithLlm(deps.languageModel)
   const classifyMotive = createClassifyMotive(deps.languageModel)
   const openException = createOpenException(deps)
+  const recordAudit = createRecordAudit(deps)
 
   return {
     async execute(input: AttachReceiptInput): Promise<Receipt> {
@@ -103,7 +105,19 @@ export function createAttachReceipt(deps: CoreDeps) {
       }
 
       await deps.receipts.save(receipt)
-      await openException.execute(receipt)
+      const opened = await openException.execute(receipt)
+      await recordAudit.writeMany(receipt.audit, { receiptId: receipt.id, tripId: receipt.tripId })
+      if (opened) {
+        await recordAudit.write({
+          at: opened.openedAt,
+          actor: 'system',
+          action: 'open-exception',
+          detail: opened.verdict,
+          receiptId: receipt.id,
+          tripId: receipt.tripId,
+          exceptionId: opened.id,
+        })
+      }
       return receipt
     },
   }

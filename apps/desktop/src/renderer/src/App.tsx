@@ -18,6 +18,7 @@ import {
 import {
   Asleep,
   Calculator,
+  Catalog,
   DocumentExport,
   Email,
   Home,
@@ -37,6 +38,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { SettlementPage } from './pages/SettlementPage'
 import { TripsPage } from './pages/TripsPage'
 import { ExceptionsPage } from './pages/ExceptionsPage'
+import { AuditPage } from './pages/AuditPage'
 import { useTheme } from './theme/ThemeProvider'
 import { readStoredTripId, storeTripId, tripFromSnapshot } from './lib/tripView'
 
@@ -47,6 +49,7 @@ const ROUTES: { id: AppRoute; label: string; icon: typeof Home; section?: 'flujo
   { id: 'recibir', label: 'Recibir', icon: Email, section: 'flujo' },
   { id: 'revisar', label: 'Por revisar', icon: WarningAlt, section: 'flujo' },
   { id: 'liquidacion', label: 'Liquidación', icon: Calculator, section: 'flujo' },
+  { id: 'auditoria', label: 'Auditoría', icon: Catalog, section: 'mas' },
   { id: 'exportar', label: 'Exportar', icon: DocumentExport, section: 'mas' },
   { id: 'ajustes', label: 'Ajustes', icon: Settings, section: 'mas' },
 ]
@@ -282,6 +285,7 @@ export function App() {
             onNeedTrip={() => go('viajes')}
           />
         ) : null}
+        {route === 'auditoria' ? <AuditPage snapshot={snapshot} tripId={trip?.id} /> : null}
         {route === 'exportar' ? (
           <ExportPage snapshot={snapshot} api={api} tripId={trip?.id} onSelectTrip={selectTrip} />
         ) : null}

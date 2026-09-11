@@ -35,7 +35,7 @@ desktop: ingest → postproceso lingüístico
 | `IFileSystem` | cada app | Nano exige `attachments[].path` en disco |
 | `IReceiptStore` | desktop (registro); móvil puede cachear | SQLite 3 local (ADR 0015) |
 | `IReportExporter` | `apps/desktop/.../exporters/{pdf,csv,xlsx,json}` | solo escritorio |
-| `IAuditLog` | desktop persistencia | eventos `audit-event` |
+| `IAuditLog` | desktop persistencia | SQLite `audit_events` (`contracts/audit-event`) |
 | `IClock` | ambas | reloj de sistema |
 
 El dominio habla de *hechos de un recibo*, *motivo*, *excepciones* y *liquidar un viaje*, no de `projectionModelSrc` ni de «el modelo dijo que procede». `ILanguageModel` sirve al postproceso **y** a `classify-motive`; nunca escribe `contracts/verdict`.

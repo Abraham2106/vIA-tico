@@ -1,4 +1,4 @@
-import type { AnalysisJob, PairingPayload, PairedDevice } from '@viaticocero/contracts'
+import type { AnalysisJob, AuditEvent, PairingPayload, PairedDevice } from '@viaticocero/contracts'
 import type { ExceptionCase } from '../../../domain/exception/index.ts'
 import type { Policy } from '../../../domain/policy/index.ts'
 import type { Receipt } from '../../../domain/receipt/index.ts'
@@ -49,4 +49,14 @@ export interface IPairingStore {
   listDevices(): Promise<PairedDevice[]>
   saveDevice(device: PairedDevice): Promise<void>
   rotateCode(payload: PairingPayload): Promise<void>
+}
+
+export type AuditListFilter = {
+  receiptId?: string
+  tripId?: string
+}
+
+export interface IAuditLog {
+  append(event: AuditEvent): Promise<void>
+  list(filter?: AuditListFilter): Promise<AuditEvent[]>
 }

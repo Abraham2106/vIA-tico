@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   parseAnalysisJob,
+  parseAuditEvent,
   parseMotiveClassification,
   parsePairingPayload,
   parseVisionResult,
@@ -67,6 +68,21 @@ describe('analysis-job y pairing', () => {
       createdAt: '2026-09-10T00:00:00.000Z',
     })
     expect(pairing.qvacProviderPublicKey).toBeUndefined()
+  })
+})
+
+describe('audit-event', () => {
+  it('acepta un evento sin veredicto de modelo', () => {
+    const event = parseAuditEvent({
+      id: 'evt-1',
+      at: '2026-09-12T10:00:00.000Z',
+      actor: 'system',
+      action: 'verdict',
+      detail: 'REVISION',
+      receiptId: 'r-1',
+      tripId: 't-1',
+    })
+    expect(event.actor).toBe('system')
   })
 })
 
