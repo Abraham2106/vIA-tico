@@ -6,9 +6,6 @@ body,
 .cds--g90 {
   height: 100%;
   margin: 0;
-}
-
-body {
   overflow: hidden;
 }
 
@@ -23,11 +20,14 @@ body {
 }
 
 .vz-content.cds--content {
+  box-sizing: border-box;
   margin: 3rem 0 0 16rem;
   padding: 0;
-  min-height: calc(100vh - 3rem);
+  height: calc(100vh - 3rem);
+  max-height: calc(100vh - 3rem);
   max-width: none;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--cds-background);
 }
 
