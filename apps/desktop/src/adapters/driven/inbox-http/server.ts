@@ -206,7 +206,7 @@ function isAddressInUse(error: unknown): boolean {
   return typeof error === 'object' && error !== null && 'code' in error && error.code === 'EADDRINUSE'
 }
 
-export function lanIpv4(interfaces: NodeJS.Dict<NodeJS.NetworkInterfaceInfo[]> = networkInterfaces()): string | undefined {
+export function lanIpv4(interfaces: ReturnType<typeof networkInterfaces> = networkInterfaces()): string | undefined {
   for (const network of Object.values(interfaces)) {
     const address = network?.find((item) => item.family === 'IPv4' && !item.internal)
     if (address) return address.address
