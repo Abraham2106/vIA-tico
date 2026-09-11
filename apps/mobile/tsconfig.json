@@ -2,6 +2,8 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "paths": {
       "@viaticocero/contracts": ["../../packages/contracts/index.ts"],
       "@viaticocero/core": ["../../packages/core/index.ts"],

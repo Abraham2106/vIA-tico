@@ -5,7 +5,11 @@ const projectRoot = __dirname
 const workspaceRoot = path.resolve(projectRoot, '../..')
 
 const config = getDefaultConfig(projectRoot)
-config.watchFolders = [workspaceRoot]
+config.watchFolders = [
+  path.resolve(workspaceRoot, 'packages/core'),
+  path.resolve(workspaceRoot, 'packages/contracts'),
+  path.resolve(workspaceRoot, 'packages/ui-tokens'),
+]
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
