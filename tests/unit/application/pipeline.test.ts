@@ -100,6 +100,12 @@ describe('pipeline de expediente (sin QVAC)', () => {
     expect(receipt.usedExtraction.monto).toBe(8500)
     expect(receipt.verdict).toBe('REVISION')
     expect(receipt.triggeredRules.map((rule) => rule.code)).toContain('DIGITOS_ALTERADOS')
+    const discarded = receipt.audit.find((entry) => entry.action === 'postprocess-discarded')
+    expect(discarded?.detail).toContain('monto')
+    const snap = await workspace.snapshot()
+    expect(snap.auditEvents.some((event) => event.action === 'postprocess-discarded' && event.detail?.includes('monto'))).toBe(
+      true,
+    )
   })
 
   it('no deja que un LLM no cableado cambie el veredicto', async () => {

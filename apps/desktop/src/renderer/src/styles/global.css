@@ -237,6 +237,72 @@ body,
   margin-top: var(--cds-spacing-05, 1rem);
 }
 
+.vz-audit-lead {
+  max-width: 46rem;
+  margin: 0 0 var(--cds-spacing-05, 1rem);
+}
+
+.vz-audit-step {
+  padding: var(--cds-spacing-04, 0.75rem) 0;
+  border-top: 1px solid var(--cds-border-subtle-00, var(--cds-border-subtle));
+}
+
+.vz-audit-step--focus {
+  outline: 2px solid var(--cds-interactive);
+  outline-offset: 4px;
+  padding-inline: var(--cds-spacing-03, 0.5rem);
+}
+
+.vz-audit-fields {
+  width: 100%;
+  margin-top: var(--cds-spacing-04, 0.75rem);
+  border-collapse: collapse;
+}
+
+.vz-audit-fields th,
+.vz-audit-fields td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.35rem 0.5rem 0.35rem 0;
+  border-bottom: 1px solid var(--cds-border-subtle-00, var(--cds-border-subtle));
+}
+
+.vz-audit-fields th {
+  width: 42%;
+  font-weight: 500;
+}
+
+.vz-audit-fields__value--changed {
+  color: var(--cds-support-info, var(--cds-interactive));
+}
+
+.vz-audit-fields__value--blocked {
+  color: var(--feedback-warning);
+  font-weight: 600;
+}
+
+.vz-audit-raw {
+  margin: var(--cds-spacing-04, 0.75rem) 0 0;
+}
+
+.vz-audit-raw pre {
+  margin: 0.35rem 0 0;
+  padding: var(--cds-spacing-04, 0.75rem);
+  max-height: 12rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.8125rem;
+  background: var(--cds-layer);
+  border: 1px solid var(--cds-border-subtle-00, var(--cds-border-subtle));
+}
+
+.vz-audit-rules {
+  margin: var(--cds-spacing-04, 0.75rem) 0 0;
+  padding-left: 1.25rem;
+}
+
 @media (max-width: 66rem) {
   .vz-content.cds--content {
     margin-left: 0;

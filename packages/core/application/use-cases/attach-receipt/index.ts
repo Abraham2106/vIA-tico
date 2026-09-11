@@ -1,5 +1,7 @@
+import type { VisionResult } from '@viaticocero/contracts'
 import { audit } from '../../../domain/shared/audit.ts'
 import type { FiredRule } from '../../../domain/shared/rules.ts'
+import type { Verdict } from '../../../domain/shared/verdict.ts'
 import { applyDigitGuard } from '../../../domain/services/digit-guard.ts'
 import { evaluateReceipt } from '../../../domain/services/verdict-engine.ts'
 import type { Receipt } from '../../../domain/receipt/index.ts'
@@ -86,9 +88,23 @@ export function createAttachReceipt(deps: CoreDeps) {
         verdict: evaluation.verdict,
         triggeredRules: evaluation.rules,
         audit: [
-          audit(now, 'vision', 'extract', `confianza=${extraction.confianza_lectura}`),
+          audit(
+            now,
+            'vision',
+            'extract',
+            `confianza=${extraction.confianza_lectura} · ${extraction.proveedor} · ${extraction.monto} ${extraction.moneda}`,
+          ),
           ...(llm.refined
-            ? [audit(now, 'llm', llm.discarded ? 'postprocess-discarded' : 'postprocess', undefined)]
+            ? [
+                audit(
+                  now,
+                  'llm',
+                  llm.discarded ? 'postprocess-discarded' : 'postprocess',
+                  llm.discarded
+                    ? `descartado: ${guarded.alteredFields.join(',')}`
+                    : postprocessAcceptedDetail(extraction, llm.refined),
+                ),
+              ]
             : []),
           ...(classified.classification
             ? [
@@ -96,11 +112,11 @@ export function createAttachReceipt(deps: CoreDeps) {
                   now,
                   'llm',
                   'classify-motive',
-                  `${classified.classification.categoria}/${classified.classification.confianza_clasificacion}`,
+                  `${classified.classification.categoria}/${classified.classification.confianza_clasificacion}: ${classified.classification.razon}`,
                 ),
               ]
             : []),
-          audit(now, 'system', 'verdict', evaluation.verdict),
+          audit(now, 'system', 'verdict', verdictAuditDetail(evaluation.verdict, evaluation.rules)),
         ],
       }
 
@@ -121,4 +137,15 @@ export function createAttachReceipt(deps: CoreDeps) {
       return receipt
     },
   }
+}
+
+function postprocessAcceptedDetail(raw: VisionResult, refined: VisionResult): string {
+  const keys = ['proveedor', 'categoria', 'motivo', 'tipo_documento', 'raw_text'] as const
+  const changed = keys.filter((key) => raw[key] !== refined[key])
+  return changed.length > 0 ? `cambió ${changed.join(',')}` : 'sin cambios materiales'
+}
+
+function verdictAuditDetail(verdict: Verdict, rules: FiredRule[]): string {
+  if (rules.length === 0) return verdict
+  return `${verdict} · ${rules.map((rule) => rule.code).join(',')}`
 }
