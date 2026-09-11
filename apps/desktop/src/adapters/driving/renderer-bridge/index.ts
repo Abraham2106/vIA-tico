@@ -2,11 +2,12 @@ import type { Workspace } from '@viaticocero/core'
 import { DEFAULT_INSTRUCT_CATALOG_ID } from '../../driven/qvac-llm/config.ts'
 import type {
   DesktopApi,
+  InboxStatus,
   QvacDesktopStatus,
   QvacLlmProgress,
   StorageInfo,
 } from '../../../ports/desktop-api.ts'
-export type { DesktopApi, QvacDesktopStatus, QvacLlmProgress, StorageInfo } from '../../../ports/desktop-api.ts'
+export type { DesktopApi, InboxStatus, QvacDesktopStatus, QvacLlmProgress, StorageInfo } from '../../../ports/desktop-api.ts'
 
 type QvacController = {
   snapshot(): QvacLlmProgress
@@ -44,7 +45,11 @@ function statusOf(workspace: Workspace): QvacDesktopStatus {
   }
 }
 
-export function workspaceToApi(workspace: Workspace, storageInfo: StorageInfo): DesktopApi {
+export function workspaceToApi(
+  workspace: Workspace,
+  storageInfo: StorageInfo,
+  options: { inboxStatus?: () => Promise<InboxStatus> } = {},
+): DesktopApi {
   return {
     snapshot: () => workspace.snapshot(),
     registerTrip: (input) => workspace.registerTrip(input),
@@ -58,6 +63,8 @@ export function workspaceToApi(workspace: Workspace, storageInfo: StorageInfo): 
     pairing: () => workspace.pairDevices.getPayload(),
     rotatePairing: () => workspace.pairDevices.rotate(),
     storageInfo: async () => storageInfo,
+    inboxStatus: async () =>
+      options.inboxStatus?.() ?? { listening: false, lastError: 'Inbox HTTP no configurado' },
     qvacStatus: async () => statusOf(workspace),
     async loadQwen() {
       const model = workspace.deps.languageModel

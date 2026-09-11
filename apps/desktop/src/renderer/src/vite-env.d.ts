@@ -9,3 +9,7 @@ declare module 'sql.js/dist/sql-wasm.js?url' {
   const url: string
   export default url
 }
+
+interface Window {
+  __VIATICOCERO_INBOX_PORT__?: number
+}
