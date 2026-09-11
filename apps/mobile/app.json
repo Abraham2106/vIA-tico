@@ -14,11 +14,25 @@
           "photosPermission": "ViáticoCero necesita la foto del comprobante.",
           "cameraPermission": "ViáticoCero captura el comprobante en el dispositivo."
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 29,
+            "useLegacyPackaging": true
+          }
+        }
+      ],
+      "./plugins/withCmakeVersion",
+      "@qvac/sdk/expo-plugin"
     ],
     "android": {
       "package": "com.viaticocero.mobile",
-      "permissions": ["CAMERA", "READ_MEDIA_IMAGES"]
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ]
     },
     "experiments": {
       "typedRoutes": false

@@ -17,5 +17,9 @@ apps/desktop/release/
 apps/mobile/android/
 apps/mobile/ios/
 apps/mobile/.expo/
+apps/mobile/qvac/worker.bundle.js
+apps/mobile/qvac/worker.bundle.entry.mjs
+apps/mobile/qvac/worker.entry.mjs
+apps/mobile/qvac/addons.manifest.json
 .idea/
 .vscode/

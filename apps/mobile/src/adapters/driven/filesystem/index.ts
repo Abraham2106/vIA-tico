@@ -1,38 +1,28 @@
-import * as FileSystem from 'expo-file-system'
+import { File, Paths } from 'expo-file-system'
 import type { IFileSystem } from '@viaticocero/core'
+
+/** Copia la URI de ImagePicker a un JPEG en caché. VisionPsy exige path en disco. */
+export async function persistCaptureToCache(uri: string): Promise<string> {
+  const dest = new File(Paths.cache, 'viaticocero-capture.jpg')
+  if (dest.exists) dest.delete()
+  new File(uri).copy(dest)
+  return dest.uri
+}
+
+export function toQvacAttachmentPath(uri: string): string {
+  return uri.startsWith('file://') ? decodeURIComponent(uri.slice('file://'.length)) : uri
+}
 
 export class ExpoFileSystemAdapter implements IFileSystem {
   async write(path: string, data: Uint8Array | string): Promise<void> {
-    const contents = typeof data === 'string' ? data : uint8ToBase64(data)
-    await FileSystem.writeAsStringAsync(path, contents, {
-      encoding: typeof data === 'string' ? FileSystem.EncodingType.UTF8 : FileSystem.EncodingType.Base64,
-    })
+    const file = new File(path)
+    if (!file.exists) file.create()
+    file.write(data)
   }
   async read(path: string): Promise<Uint8Array> {
-    const base64 = await FileSystem.readAsStringAsync(path, {
-      encoding: FileSystem.EncodingType.Base64,
-    })
-    return base64ToUint8(base64)
+    return new File(path).bytes()
   }
   async exists(path: string): Promise<boolean> {
-    const info = await FileSystem.getInfoAsync(path)
-    return info.exists
+    return new File(path).exists
   }
-}
-
-function uint8ToBase64(bytes: Uint8Array): string {
-  let binary = ''
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte)
-  })
-  return btoa(binary)
-}
-
-function base64ToUint8(value: string): Uint8Array {
-  const binary = atob(value)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i)
-  }
-  return bytes
 }

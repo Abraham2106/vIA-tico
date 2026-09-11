@@ -4,8 +4,11 @@ import { router } from 'expo-router'
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from '@viaticocero/contracts'
 import { CATEGORY_LABELS } from '@viaticocero/ui-tokens'
 import { ExpoImageCamera, ExpoLibraryPicker } from '../../src/adapters/driven/camera'
+import { toQvacAttachmentPath } from '../../src/adapters/driven/filesystem'
+import { getMobileWorkspace } from '../../src/composition/expo'
 import { getDraft, setDraft } from '../../src/state/draft'
 import { useAppTheme } from '../../src/theme'
+import type { VisionpsyProfile } from '../../src/adapters/driven/qvac-visionpsy/profile.ts'
 
 export default function CaptureScreen() {
   const theme = useAppTheme()
@@ -15,6 +18,8 @@ export default function CaptureScreen() {
   const [monto, setMonto] = useState(String(draft.dto.monto || ''))
   const [categoria, setCategoria] = useState<ReceiptCategory>(draft.dto.categoria ?? 'alimentacion')
   const [imagePath, setImagePath] = useState(draft.imagePath ?? '')
+  const [profile, setProfile] = useState<VisionpsyProfile>('flash')
+  const [reading, setReading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const styles = makeStyles(theme)
 
@@ -22,6 +27,7 @@ export default function CaptureScreen() {
     try {
       const captured = await new ExpoImageCamera().capture()
       setImagePath(captured.path)
+      await readWithVision(captured.path)
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     }
@@ -31,21 +37,50 @@ export default function CaptureScreen() {
     try {
       const captured = await new ExpoLibraryPicker().capture()
       setImagePath(captured.path)
+      await readWithVision(captured.path)
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     }
   }
 
+  async function readWithVision(path: string) {
+    setError(null)
+    setReading(true)
+    try {
+      const dto = await getMobileWorkspace().analyzeReceipt({
+        imagePath: toQvacAttachmentPath(path),
+        profile,
+      })
+      setProveedor(dto.proveedor)
+      setFecha(dto.fecha)
+      setMonto(String(dto.monto))
+      if (dto.categoria) setCategoria(dto.categoria)
+      setDraft({
+        imagePath: path,
+        dto: { ...getDraft().dto, ...dto },
+      })
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'VisionPsy no pudo leer el comprobante. Completa el DTO a mano.',
+      )
+    } finally {
+      setReading(false)
+    }
+  }
+
   function goPreview() {
+    const current = getDraft().dto
     setDraft({
       imagePath: imagePath || undefined,
       dto: {
-        ...getDraft().dto,
-        proveedor: proveedor.trim() || 'Proveedor sin nombre',
+        ...current,
+        proveedor: proveedor.trim() || current.proveedor || 'Proveedor sin nombre',
         fecha,
         monto: Number(monto) || 0,
         categoria,
-        raw_text: `${proveedor} ${fecha} ${monto}`.trim(),
+        raw_text: current.raw_text || `${proveedor} ${fecha} ${monto}`.trim(),
       },
     })
     router.push('/preview')
@@ -54,13 +89,31 @@ export default function CaptureScreen() {
   return (
     <ScrollView contentContainerStyle={styles.wrap}>
       <Text style={styles.copy}>
-        Centre el comprobante y confirme los datos. VisionPsy aún no está cableado: el DTO puede
-        salir de captura manual.
+        Centre el comprobante. VisionPsy extrae el DTO en el dispositivo; puedes corregir
+        los campos. El modelo no autoriza el gasto.
       </Text>
+      <Text style={styles.label}>Perfil VisionPsy</Text>
+      <View style={styles.row}>
+        <Pressable
+          style={[styles.btn, profile === 'flash' && styles.btnSelected]}
+          onPress={() => setProfile('flash')}
+          accessibilityLabel="Perfil Flash, menor RAM"
+        >
+          <Text style={styles.btnText}>Flash</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.btn, profile === 'base' && styles.btnSelected]}
+          onPress={() => setProfile('base')}
+          accessibilityLabel="Perfil Base, ticket denso"
+        >
+          <Text style={styles.btnText}>Base</Text>
+        </Pressable>
+      </View>
       <View style={styles.row}>
         <Pressable
           style={styles.btn}
           onPress={() => void takePhoto()}
+          disabled={reading}
           accessibilityLabel="Tomar fotografía del comprobante"
         >
           <Text style={styles.btnText}>Cámara</Text>
@@ -68,12 +121,15 @@ export default function CaptureScreen() {
         <Pressable
           style={styles.btn}
           onPress={() => void pickPhoto()}
+          disabled={reading}
           accessibilityLabel="Seleccionar imagen de la galería"
         >
           <Text style={styles.btnText}>Galería</Text>
         </Pressable>
       </View>
-      <Text style={styles.meta}>{imagePath ? 'Imagen adjunta' : 'Sin adjunto'}</Text>
+      <Text style={styles.meta}>
+        {reading ? 'VisionPsy leyendo…' : imagePath ? 'Imagen adjunta' : 'Sin adjunto'}
+      </Text>
       <Field label="Proveedor" value={proveedor} onChange={setProveedor} styles={styles} />
       <Field label="Fecha" value={fecha} onChange={setFecha} styles={styles} />
       <Field label="Monto" value={monto} onChange={setMonto} keyboardType="numeric" styles={styles} />
@@ -153,6 +209,10 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
       padding: 12,
       minHeight: 48,
       justifyContent: 'center',
+    },
+    btnSelected: {
+      backgroundColor: theme.colors.interactiveSurface,
+      borderColor: theme.colors.interactive,
     },
     btnText: { color: theme.colors.text, textAlign: 'center', fontWeight: '500' },
     meta: { color: theme.colors.brand, fontSize: 12 },

@@ -1,5 +1,5 @@
 import * as Sharing from 'expo-sharing'
-import * as FileSystem from 'expo-file-system'
+import { File, Paths } from 'expo-file-system'
 import type { AnalysisJob } from '@viaticocero/contracts'
 import type { IJobTransport } from '@viaticocero/core'
 
@@ -19,10 +19,12 @@ export class HttpJobTransport implements IJobTransport {
 
 export class ShareFileJobTransport implements IJobTransport {
   async send(job: AnalysisJob): Promise<void> {
-    const path = `${FileSystem.cacheDirectory}job-${job.id}.json`
-    await FileSystem.writeAsStringAsync(path, JSON.stringify(job, null, 2))
+    const file = new File(Paths.cache, `job-${job.id}.json`)
+    if (file.exists) file.delete()
+    file.create()
+    file.write(JSON.stringify(job, null, 2))
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(path, {
+      await Sharing.shareAsync(file.uri, {
         mimeType: 'application/json',
         dialogTitle: 'Enviar analysis-job a escritorio',
       })

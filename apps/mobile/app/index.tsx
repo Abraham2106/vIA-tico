@@ -25,8 +25,8 @@ export default function HomeScreen() {
         {formatDisplayDate(DEMO_TRIP.startDate)} – {formatDisplayDate(DEMO_TRIP.endDate)}
       </Text>
       <Text style={styles.copy}>
-        Foto o DTO manual → revisión → analysis-job al escritorio. VisionPsy está como puerto (
-        {visionStatus}). El celular no liquida.
+        Foto → VisionPsy on-device → revisión → analysis-job al escritorio. Estado del
+        adaptador: {visionStatus}. El celular no liquida.
       </Text>
       <Link href="/capture" asChild>
         <Pressable

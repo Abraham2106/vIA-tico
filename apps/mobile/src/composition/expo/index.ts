@@ -5,14 +5,14 @@ import {
   DEMO_TRIP,
   type Workspace,
 } from '@viaticocero/core'
-import { QvacVisionPsyStub } from '../../adapters/driven/qvac-visionpsy/index.ts'
+import { QvacVisionPsyAdapter } from '../../adapters/driven/qvac-visionpsy/index.ts'
 
 let cached: Workspace | undefined
 
 export function getMobileWorkspace(): Workspace {
   if (cached) return cached
   const deps = createMemoryDeps()
-  deps.vision = new QvacVisionPsyStub()
+  deps.vision = new QvacVisionPsyAdapter()
   cached = createWorkspace(deps)
   return cached
 }

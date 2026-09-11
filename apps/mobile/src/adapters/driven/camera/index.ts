@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker'
 import type { CapturedImage, ICamera } from '@viaticocero/core'
+import { persistCaptureToCache } from '../filesystem/index.ts'
 
 export class ExpoImageCamera implements ICamera {
   async capture(): Promise<CapturedImage> {
@@ -16,7 +17,7 @@ export class ExpoImageCamera implements ICamera {
     }
     const asset = result.assets[0]
     return {
-      path: asset.uri,
+      path: await persistCaptureToCache(asset.uri),
       mimeType: asset.mimeType ?? 'image/jpeg',
     }
   }
@@ -37,7 +38,7 @@ export class ExpoLibraryPicker implements ICamera {
     }
     const asset = result.assets[0]
     return {
-      path: asset.uri,
+      path: await persistCaptureToCache(asset.uri),
       mimeType: asset.mimeType ?? 'image/jpeg',
     }
   }
