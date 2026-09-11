@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
   Button,
-  DatePicker,
-  DatePickerInput,
   Form,
   NumberInput,
   Select,
@@ -24,7 +22,6 @@ import { CategoryChip } from '../components/CategoryChip'
 import { ConfidenceBar } from '../components/ConfidenceBar'
 import { PageScaffold } from '../components/PageScaffold'
 import { VerdictPill } from '../components/VerdictPill'
-import { toIsoDate } from '../lib/isoDate'
 import type { DesktopApi } from '../../../ports/desktop-api.ts'
 
 type Props = {
@@ -150,17 +147,13 @@ export function ReceiptsPage({ snapshot, api, onChange, focusTripId, onNeedTrip 
           value={proveedor}
           onChange={(event) => setProveedor(event.target.value)}
         />
-        <DatePicker
-          datePickerType="single"
-          dateFormat="Y-m-d"
+        <TextInput
+          id="fecha"
+          type="date"
+          labelText="Fecha"
           value={fecha}
-          onChange={(dates) => {
-            const next = dates[0]
-            if (next) setFecha(toIsoDate(next))
-          }}
-        >
-          <DatePickerInput id="fecha" labelText="Fecha" placeholder="yyyy-mm-dd" />
-        </DatePicker>
+          onChange={(event) => setFecha(event.target.value)}
+        />
         <NumberInput
           id="monto"
           label="Monto"

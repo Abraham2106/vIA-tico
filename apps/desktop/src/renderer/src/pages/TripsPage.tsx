@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import {
   Button,
-  DatePicker,
-  DatePickerInput,
   Form,
   NumberInput,
   Table,
@@ -18,7 +16,6 @@ import {
 import { formatMoney, type WorkspaceSnapshot } from '@viaticocero/core'
 import { formatDisplayDate } from '@viaticocero/ui-tokens'
 import { PageScaffold } from '../components/PageScaffold'
-import { toIsoDate } from '../lib/isoDate'
 import type { DesktopApi } from '../../../ports/desktop-api.ts'
 
 type Props = {
@@ -133,28 +130,20 @@ export function TripsPage({
           value={destination}
           onChange={(event) => setDestination(event.target.value)}
         />
-        <DatePicker
-          datePickerType="single"
-          dateFormat="Y-m-d"
+        <TextInput
+          id="inicio"
+          type="date"
+          labelText="Inicio"
           value={startDate}
-          onChange={(dates) => {
-            const next = dates[0]
-            if (next) setStartDate(toIsoDate(next))
-          }}
-        >
-          <DatePickerInput id="inicio" labelText="Inicio" placeholder="yyyy-mm-dd" />
-        </DatePicker>
-        <DatePicker
-          datePickerType="single"
-          dateFormat="Y-m-d"
+          onChange={(event) => setStartDate(event.target.value)}
+        />
+        <TextInput
+          id="fin"
+          type="date"
+          labelText="Fin"
           value={endDate}
-          onChange={(dates) => {
-            const next = dates[0]
-            if (next) setEndDate(toIsoDate(next))
-          }}
-        >
-          <DatePickerInput id="fin" labelText="Fin" placeholder="yyyy-mm-dd" />
-        </DatePicker>
+          onChange={(event) => setEndDate(event.target.value)}
+        />
         <NumberInput
           id="adelanto"
           label="Adelanto"
