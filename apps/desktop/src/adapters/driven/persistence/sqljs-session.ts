@@ -3,32 +3,26 @@ import type { SqlPrimitive, SqliteSession } from './session.ts'
 
 type InitSqlJs = (config?: { wasmBinary?: Buffer | Uint8Array; locateFile?: (file: string) => string }) => Promise<SqlJsStatic>
 
-function unwrapInitSqlJs(mod: unknown): InitSqlJs {
-  const seen = new Set<unknown>()
-  let current: unknown = mod
-  while (current && !seen.has(current)) {
-    seen.add(current)
-    if (typeof current === 'function') return current as InitSqlJs
-    if (typeof current === 'object') {
-      const rec = current as Record<string, unknown>
-      if (typeof rec.default === 'function') return rec.default as InitSqlJs
-      if (typeof rec.initSqlJs === 'function') return rec.initSqlJs as InitSqlJs
-      if (typeof rec.Module === 'function') return rec.Module as InitSqlJs
-      current = rec.default ?? rec.Module
-      continue
-    }
-    break
-  }
-  throw new Error('sql.js no exportó initSqlJs como función')
-}
-
 async function loadSqlJs(): Promise<SqlJsStatic> {
-  const [mod, wasmUrl] = await Promise.all([
-    import('sql.js/dist/sql-wasm-browser.js'),
-    import('sql.js/dist/sql-wasm-browser.wasm?url'),
+  const [jsMod, wasmMod] = await Promise.all([
+    import('sql.js/dist/sql-wasm.js?url'),
+    import('sql.js/dist/sql-wasm.wasm?url'),
   ])
-  const initSqlJs = unwrapInitSqlJs(mod)
-  return initSqlJs({ locateFile: () => wasmUrl.default })
+  const w = window as Window & { initSqlJs?: InitSqlJs }
+  if (typeof w.initSqlJs !== 'function') {
+    await new Promise<void>((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = jsMod.default
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error('No se pudo descargar el motor SQLite (sql-wasm.js)'))
+      document.head.appendChild(script)
+    })
+  }
+  if (typeof w.initSqlJs !== 'function') {
+    throw new Error('sql.js no dejó initSqlJs en window')
+  }
+  const wasmBinary = new Uint8Array(await (await fetch(wasmMod.default)).arrayBuffer())
+  return w.initSqlJs({ wasmBinary })
 }
 
 export function wrapSqlJsDatabase(db: Database, persistBytes: (bytes: Uint8Array) => Promise<void>): SqliteSession {

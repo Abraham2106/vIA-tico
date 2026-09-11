@@ -5,8 +5,7 @@ declare module '*.wasm?url' {
   export default url
 }
 
-declare module 'sql.js/dist/sql-wasm-browser.js' {
-  import type { SqlJsStatic } from 'sql.js'
-  const initSqlJs: (config?: { locateFile?: (file: string) => string }) => Promise<SqlJsStatic>
-  export default initSqlJs
+declare module 'sql.js/dist/sql-wasm.js?url' {
+  const url: string
+  export default url
 }
