@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "main": "dist/main/index.js",
-  "author": "ViáticoCero",
+  "author": {
+    "name": "ViáticoCero",
+    "email": "viaticocero@users.noreply.github.com"
+  },
   "description": "Liquidación de viáticos local-first. La IA interpreta; el código autoriza.",
   "homepage": "https://github.com/Abraham2106/vIA-tico",
   "repository": {
@@ -17,9 +20,9 @@
     "preview:web": "vite preview --config vite.config.ts --host 127.0.0.1 --port 4173",
     "dev": "electron-vite dev -- --no-sandbox",
     "build": "electron-vite build",
-    "dist:linux": "electron-vite build && electron-builder --linux",
-    "dist:win": "electron-vite build && electron-builder --win",
-    "dist:mac": "electron-vite build && electron-builder --mac --arm64 --x64",
+    "dist:linux": "electron-vite build && electron-builder --linux --publish never",
+    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:mac": "electron-vite build && electron-builder --mac --arm64 --publish never && electron-builder --mac --x64 --publish never",
     "typecheck": "tsc -p tsconfig.web.json --noEmit"
   },
   "dependencies": {
