@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { getPairing, setPairing } from './state'
+import { DEFAULT_INBOX_URL, getPairing, loadPairing, savePairing } from './state'
 import { FocusablePressable } from '../../src/components/FocusablePressable'
 import { useAppTheme } from '../../src/theme'
 
@@ -8,13 +8,29 @@ export default function PairingScreen() {
   const theme = useAppTheme()
   const current = getPairing()
   const [code, setCode] = useState(current.pairingCode)
-  const [inboxUrl, setInboxUrl] = useState(current.inboxUrl ?? '')
+  const [inboxUrl, setInboxUrl] = useState(current.inboxUrl ?? DEFAULT_INBOX_URL)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const styles = makeStyles(theme)
 
-  function save() {
-    setPairing({ pairingCode: code, inboxUrl, transport: 'dto' })
-    setSaved(true)
+  useEffect(() => {
+    void loadPairing().then((loaded) => {
+      setCode(loaded.pairingCode)
+      setInboxUrl(loaded.inboxUrl ?? DEFAULT_INBOX_URL)
+    })
+  }, [])
+
+  async function save() {
+    setSaved(false)
+    setError(null)
+    try {
+      const persisted = await savePairing({ pairingCode: code, inboxUrl, transport: 'dto' })
+      setCode(persisted.pairingCode)
+      setInboxUrl(persisted.inboxUrl ?? DEFAULT_INBOX_URL)
+      setSaved(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo guardar el pairing')
+    }
   }
 
   return (
@@ -42,12 +58,21 @@ export default function PairingScreen() {
         placeholderTextColor={theme.colors.tertiary}
         accessibilityLabel="URL del inbox del escritorio"
       />
-      <FocusablePressable style={styles.primary} onPress={save} accessibilityLabel="Guardar emparejamiento">
+      <FocusablePressable
+        style={styles.primary}
+        onPress={() => void save()}
+        accessibilityLabel="Guardar emparejamiento"
+      >
         <Text style={styles.primaryText}>Guardar pairing</Text>
       </FocusablePressable>
       {saved ? (
         <Text style={styles.ok} accessibilityLiveRegion="polite">
-          Guardado. El envío usa IJobTransport DTO.
+          Guardado en el dispositivo. El envío usa IJobTransport DTO.
+        </Text>
+      ) : null}
+      {error ? (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          {error}
         </Text>
       ) : null}
     </View>
@@ -83,5 +108,6 @@ function makeStyles(theme: ReturnType<typeof useAppTheme>) {
     },
     primaryText: { color: theme.colors.inverse, textAlign: 'center', ...theme.type.subheading, fontWeight: '600' },
     ok: { color: theme.colors.success, ...theme.type.body },
+    error: { color: theme.colors.error, ...theme.type.body },
   })
 }

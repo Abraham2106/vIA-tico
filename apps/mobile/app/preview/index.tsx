@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { draftToJob, getDraft } from '../../src/state/draft'
 import { ShareFileJobTransport } from '../../src/adapters/driven/transport'
 import { HttpJobTransport } from '../../src/adapters/driven/transport'
-import { getPairing } from '../pairing/state'
+import { loadPairing } from '../pairing/state'
 import { CATEGORY_LABELS, confidenceFill, confidenceTone, formatDisplayDate } from '@viaticocero/ui-tokens'
 import { AppEmptyState } from '../../src/components/AppEmptyState'
 import { FocusablePressable } from '../../src/components/FocusablePressable'
@@ -12,11 +12,18 @@ import { useAppTheme } from '../../src/theme'
 
 export default function PreviewScreen() {
   const theme = useAppTheme()
-  const draft = getDraft()
-  const job = draftToJob()
+  const [draft, setDraftView] = useState(getDraft)
+  const [job, setJob] = useState(() => draftToJob())
   const [message, setMessage] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   const styles = makeStyles(theme)
+  useFocusEffect(
+    useCallback(() => {
+      setDraftView(getDraft())
+      setJob(draftToJob())
+      void loadPairing()
+    }, []),
+  )
   const tone = confidenceTone(draft.dto.confianza_lectura)
   const fill = confidenceFill(draft.dto.confianza_lectura)
   const toneColor =
@@ -25,7 +32,9 @@ export default function PreviewScreen() {
   async function sendShare() {
     setSending(true)
     try {
-      await new ShareFileJobTransport().send(job)
+      const currentJob = draftToJob()
+      setJob(currentJob)
+      await new ShareFileJobTransport().send(currentJob)
       setMessage('Job listo para compartir')
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error))
@@ -35,14 +44,16 @@ export default function PreviewScreen() {
   }
 
   async function sendHttp() {
-    const pairing = getPairing()
+    const pairing = await loadPairing()
     if (!pairing.inboxUrl) {
       setMessage('Configura inbox URL en Emparejar')
       return
     }
     setSending(true)
     try {
-      await new HttpJobTransport(pairing.inboxUrl).send(job)
+      const currentJob = draftToJob()
+      setJob(currentJob)
+      await new HttpJobTransport(pairing.inboxUrl).send(currentJob)
       setMessage('Enviado al inbox del escritorio')
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error))
@@ -72,6 +83,9 @@ export default function PreviewScreen() {
         <Row k="Fecha" v={formatDisplayDate(draft.dto.fecha)} styles={styles} />
         <Row k="Monto" v={`${draft.dto.monto} ${draft.dto.moneda}`} styles={styles} tabular />
         <Row k="Categoría" v={CATEGORY_LABELS[category]} styles={styles} />
+        {draft.dto.motivo?.trim() ? (
+          <Row k="Motivo" v={draft.dto.motivo} styles={styles} />
+        ) : null}
         <View style={styles.confidence}>
           <View style={styles.row}>
             <Text style={styles.k}>Confianza de lectura</Text>
