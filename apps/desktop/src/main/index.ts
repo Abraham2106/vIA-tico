@@ -26,7 +26,7 @@ async function createWindow() {
     getPairingCode: async () => (await workspace.pairDevices.getPayload()).pairingCode,
     onJob: async (job) => {
       await workspace.ingestVisionResult(job)
-      if (!mainWindow?.isDestroyed()) {
+      if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send(IPC_CHANNELS.inboxJob, job)
       }
     },
@@ -86,9 +86,11 @@ async function createWindow() {
     if (closing) return
     event.preventDefault()
     closing = true
+    const stopInbox = inbox?.stop().catch(() => undefined) ?? Promise.resolve()
+    const closeController = controller?.close?.().catch(() => undefined) ?? Promise.resolve()
     void Promise.all([
-      inbox?.stop().catch(() => undefined),
-      controller?.close().catch(() => undefined),
+      stopInbox,
+      closeController,
     ]).finally(() => {
       app.quit()
     })
