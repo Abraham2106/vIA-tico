@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
+import { createInboxHttpServer, type InboxHttpServer } from '../adapters/driven/inbox-http/server.ts'
 import { IPC_CHANNELS } from '../adapters/driving/ipc/index.ts'
 import { qvacControllerOf, workspaceToApi } from '../adapters/driving/renderer-bridge/index.ts'
 import { createElectronWorkspace } from '../composition/electron/index.ts'
@@ -10,6 +11,8 @@ if (process.platform === 'linux') {
 }
 
 let closing = false
+let inbox: InboxHttpServer | undefined
+let mainWindow: BrowserWindow | undefined
 
 async function createWindow() {
   process.env.QVAC_CONFIG_PATH = resolveQvacConfigPath({
@@ -19,7 +22,24 @@ async function createWindow() {
     override: process.env.QVAC_CONFIG_PATH,
   })
   const { workspace, storageInfo } = await createElectronWorkspace()
-  const api = workspaceToApi(workspace, storageInfo)
+  inbox = createInboxHttpServer({
+    getPairingCode: async () => (await workspace.pairDevices.getPayload()).pairingCode,
+    onJob: async (job) => {
+      await workspace.ingestVisionResult(job)
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send(IPC_CHANNELS.inboxJob, job)
+      }
+    },
+  })
+  const inboxStatus = await inbox.start()
+  if (inboxStatus.listening && inboxStatus.url) {
+    const pairing = await workspace.pairDevices.getPayload()
+    await workspace.deps.pairing.rotateCode({ ...pairing, inboxUrl: inboxStatus.url })
+  }
+
+  const api = workspaceToApi(workspace, storageInfo, {
+    inboxStatus: async () => inbox?.status() ?? { listening: false, lastError: 'Inbox no inicializado' },
+  })
   const controller = qvacControllerOf(workspace)
 
   ipcMain.handle(IPC_CHANNELS.snapshot, () => api.snapshot())
@@ -34,6 +54,7 @@ async function createWindow() {
   ipcMain.handle(IPC_CHANNELS.pairing, () => api.pairing())
   ipcMain.handle(IPC_CHANNELS.rotatePairing, () => api.rotatePairing())
   ipcMain.handle(IPC_CHANNELS.storageInfo, () => api.storageInfo())
+  ipcMain.handle(IPC_CHANNELS.inboxStatus, () => api.inboxStatus())
   ipcMain.handle(IPC_CHANNELS.qvacStatus, () => api.qvacStatus())
   ipcMain.handle(IPC_CHANNELS.qvacLoad, () => api.loadQwen())
   ipcMain.handle(IPC_CHANNELS.qvacUnload, () => api.unloadQwen())
@@ -47,6 +68,7 @@ async function createWindow() {
       nodeIntegration: false,
     },
   })
+  mainWindow = window
 
   controller?.setProgressListener?.((snapshot) => {
     if (!window.isDestroyed()) {
@@ -61,10 +83,15 @@ async function createWindow() {
   }
 
   app.on('before-quit', (event) => {
-    if (closing || !controller?.close) return
+    if (closing) return
     event.preventDefault()
     closing = true
-    void controller.close().finally(() => {
+    const stopInbox = inbox?.stop().catch(() => undefined) ?? Promise.resolve()
+    const closeController = controller?.close?.().catch(() => undefined) ?? Promise.resolve()
+    void Promise.all([
+      stopInbox,
+      closeController,
+    ]).finally(() => {
       app.quit()
     })
   })

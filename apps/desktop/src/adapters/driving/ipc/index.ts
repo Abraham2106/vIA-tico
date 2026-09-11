@@ -16,6 +16,8 @@ export const IPC_CHANNELS = {
   pairing: 'viatico:pairing',
   rotatePairing: 'viatico:rotate-pairing',
   storageInfo: 'viatico:storage-info',
+  inboxStatus: 'viatico:inbox-status',
+  inboxJob: 'viatico:inbox-job',
   qvacStatus: 'viatico:qvac-status',
   qvacLoad: 'viatico:qvac-load',
   qvacUnload: 'viatico:qvac-unload',

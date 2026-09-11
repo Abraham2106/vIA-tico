@@ -89,6 +89,15 @@ export function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
+  useEffect(() => {
+    const stop = api?.onInboxJob?.(() => {
+      void reload()
+    })
+    return () => {
+      stop?.()
+    }
+  }, [api, reload])
+
   const trip = snapshot ? tripFromSnapshot(snapshot, selectedTripId) : undefined
 
   useEffect(() => {

@@ -33,7 +33,7 @@ SQLite 3, archivo local, mismo esquema en los dos runtimes del escritorio.
 
 ## Qué no es
 
-- No hay servidor. No hay usuario/contraseña. No hay sync a la nube.
+- No hay servidor cloud, usuario/contraseña ni sync a la nube. Electron abre un inbox HTTP local en la LAN para recibir `analysis-job` del celular.
 - El móvil no abre esta base. El DTO `analysis-job` entra por inbox y el escritorio lo inserta.
 - Nested JSON (`vision-result`, reglas, auditoría del recibo) va en columnas TEXT. Las FKs y los filtros (viaje, excepción abierta) sí son columnas.
 

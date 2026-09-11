@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC_CHANNELS } from '../adapters/driving/ipc/index.ts'
+import type { AnalysisJob } from '@viaticocero/contracts'
 import type { QvacLlmProgress } from '../ports/desktop-api.ts'
 
 const api = {
@@ -15,6 +16,7 @@ const api = {
   pairing: () => ipcRenderer.invoke(IPC_CHANNELS.pairing),
   rotatePairing: () => ipcRenderer.invoke(IPC_CHANNELS.rotatePairing),
   storageInfo: () => ipcRenderer.invoke(IPC_CHANNELS.storageInfo),
+  inboxStatus: () => ipcRenderer.invoke(IPC_CHANNELS.inboxStatus),
   qvacStatus: () => ipcRenderer.invoke(IPC_CHANNELS.qvacStatus),
   loadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacLoad),
   unloadQwen: () => ipcRenderer.invoke(IPC_CHANNELS.qvacUnload),
@@ -23,6 +25,13 @@ const api = {
     ipcRenderer.on(IPC_CHANNELS.qvacProgress, wrapped)
     return () => {
       ipcRenderer.removeListener(IPC_CHANNELS.qvacProgress, wrapped)
+    }
+  },
+  onInboxJob: (listener: (job: AnalysisJob) => void) => {
+    const wrapped = (_event: unknown, job: AnalysisJob) => listener(job)
+    ipcRenderer.on(IPC_CHANNELS.inboxJob, wrapped)
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.inboxJob, wrapped)
     }
   },
 }

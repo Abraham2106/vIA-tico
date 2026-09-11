@@ -1,12 +1,34 @@
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+import { createInboxHttpServer } from './src/adapters/driven/inbox-http/server.ts'
 
 const workspace = fileURLToPath(new URL('../..', import.meta.url))
 
+function inboxHttpPlugin(): Plugin {
+  let inbox = createInboxHttpServer()
+
+  return {
+    name: 'viaticocero-inbox-http',
+    async configureServer(server) {
+      await inbox.start()
+      server.httpServer?.once('close', () => {
+        void inbox.stop()
+      })
+    },
+    transformIndexHtml(html) {
+      const port = inbox.status().port ?? 47_821
+      return html.replace(
+        '</head>',
+        `<script>window.__VIATICOCERO_INBOX_PORT__=${JSON.stringify(port)}</script></head>`,
+      )
+    },
+  }
+}
+
 export default defineConfig({
   root: fileURLToPath(new URL('./src/renderer', import.meta.url)),
-  plugins: [react()],
+  plugins: [react(), inboxHttpPlugin()],
   resolve: {
     alias: [
       {

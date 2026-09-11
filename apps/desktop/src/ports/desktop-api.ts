@@ -28,6 +28,13 @@ export type QvacDesktopStatus = {
   progress?: QvacLlmProgress
 }
 
+export type InboxStatus = {
+  listening: boolean
+  url?: string
+  port?: number
+  lastError?: string
+}
+
 export type StorageInfo = {
   engine: 'sqlite3'
   location: 'file' | 'indexeddb' | 'memory'
@@ -49,8 +56,10 @@ export type DesktopApi = {
   pairing(): Promise<PairingPayload>
   rotatePairing(): Promise<PairingPayload>
   storageInfo(): Promise<StorageInfo>
+  inboxStatus(): Promise<InboxStatus>
   qvacStatus(): Promise<QvacDesktopStatus>
   loadQwen(): Promise<QvacDesktopStatus>
   unloadQwen(): Promise<QvacDesktopStatus>
   onQvacProgress?: (listener: (progress: QvacLlmProgress) => void) => () => void
+  onInboxJob?: (listener: (job: AnalysisJob) => void) => () => void
 }

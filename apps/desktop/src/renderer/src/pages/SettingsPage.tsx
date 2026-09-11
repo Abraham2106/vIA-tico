@@ -15,7 +15,7 @@ import type { Policy, WorkspaceSnapshot } from '@viaticocero/core'
 import type { ThemePreference } from '@viaticocero/ui-tokens'
 import { PageScaffold } from '../components/PageScaffold'
 import { useTheme } from '../theme/ThemeProvider'
-import type { DesktopApi, QvacDesktopStatus, StorageInfo } from '../../../ports/desktop-api.ts'
+import type { DesktopApi, InboxStatus, QvacDesktopStatus, StorageInfo } from '../../../ports/desktop-api.ts'
 
 type Props = {
   snapshot: WorkspaceSnapshot
@@ -42,6 +42,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
   const [pairingCode, setPairingCode] = useState(snapshot.pairing.pairingCode)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
   const [storage, setStorage] = useState<StorageInfo | null>(null)
+  const [inbox, setInbox] = useState<InboxStatus | null>(null)
 
   const refreshQvac = useCallback(async () => {
     setQvacLoading(true)
@@ -57,6 +58,23 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
 
   useEffect(() => {
     void api.storageInfo().then(setStorage).catch(() => setStorage(null))
+  }, [api])
+
+  useEffect(() => {
+    let active = true
+    const refreshInbox = () => {
+      void api.inboxStatus().then((status) => {
+        if (active) setInbox(status)
+      }).catch(() => {
+        if (active) setInbox({ listening: false, lastError: 'No se pudo consultar el inbox.' })
+      })
+    }
+    refreshInbox()
+    const interval = window.setInterval(refreshInbox, 5_000)
+    return () => {
+      active = false
+      window.clearInterval(interval)
+    }
   }, [api])
 
   useEffect(() => {
@@ -151,12 +169,23 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
         </OptionsTile>
       </Form>
 
-      <OptionsTile title="Emparejamiento" summary={pairingCode} open>
+      <OptionsTile
+        title="Emparejamiento"
+        summary={inbox?.listening ? 'Inbox HTTP escuchando' : inbox?.lastError ?? pairingCode}
+        open
+      >
         <p className="cds--label-01">El celular envía el gasto ya leído. No usamos la clave P2P de QVAC para el expediente.</p>
         <p className="vz-num" style={{ fontSize: '2rem', margin: '0.5rem 0' }}>
           {pairingCode}
         </p>
-        <p className="cds--label-01">Inbox: {snapshot.pairing.inboxUrl ?? 'local'}</p>
+        <p className="cds--label-01">
+          Inbox LAN: {inbox?.url ?? snapshot.pairing.inboxUrl ?? 'sin URL'}
+        </p>
+        <p className="cds--label-01">
+          {inbox?.listening
+            ? `Escuchando en el puerto ${inbox.port}.`
+            : `No está escuchando${inbox?.lastError ? `: ${inbox.lastError}` : '.'}`}
+        </p>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button kind="secondary" size="sm" onClick={() => void copyPairingCode()}>
             {copyState === 'copied' ? 'Código en portapapeles' : 'Copiar código'}
