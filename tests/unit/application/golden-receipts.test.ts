@@ -6,10 +6,9 @@ import {
   createWorkspace,
   DEMO_TRAVELER,
   DEMO_TRIP,
-  parseVisionResult,
   type Verdict,
-  type VisionResult,
 } from '@viaticocero/core'
+import { parseVisionResult, type VisionResult } from '@viaticocero/contracts'
 
 type GoldenFixture = {
   id: string
