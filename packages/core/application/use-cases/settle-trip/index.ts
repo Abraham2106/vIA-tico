@@ -1,17 +1,12 @@
-import { settleTrip } from '../../../domain/services/settlement.ts'
 import type { Settlement } from '../../../domain/settlement/index.ts'
 import type { CoreDeps } from '../../ports/outbound/workspace.ts'
+import { createReconcileAdvance } from '../reconcile-advance/index.ts'
 
 export function createSettleTrip(deps: Pick<CoreDeps, 'trips' | 'receipts' | 'exceptions'>) {
+  const reconcileAdvance = createReconcileAdvance(deps)
   return {
-    async execute(tripId: string): Promise<Settlement> {
-      const trip = await deps.trips.get(tripId)
-      if (!trip) throw new Error(`Viaje ${tripId} no existe`)
-      const [receipts, exceptions] = await Promise.all([
-        deps.receipts.listByTrip(tripId),
-        deps.exceptions.listByTrip(tripId),
-      ])
-      return settleTrip(trip, receipts, exceptions)
+    execute(tripId: string): Promise<Settlement> {
+      return reconcileAdvance.execute(tripId)
     },
   }
 }

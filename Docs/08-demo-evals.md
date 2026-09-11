@@ -22,14 +22,14 @@ Eso es el equivalente local de *texto peligroso → bloquea* / *PARK o REFUSE*.
 
 ## Evals repetibles
 
-Golden set en `apps/mobile/resources/samples/receipts/` (y fixtures de viaje en tests de dominio):
+Golden set JSON en `apps/mobile/resources/samples/receipts/` (y fixtures de viaje en tests de dominio):
 
-- Tickets CR/MX reales o realistas (español, colones/pesos, IVA).
-- Al menos un **fuera de período**.
-- Al menos un **duplicado**.
-- Al menos uno **denso / térmico** (perfil Base).
-- Al menos uno **ilegible** → REVISIÓN, no invento.
-- Al menos un **motivo ambiguo** → `classify-motive` no inventa categoría con confianza alta.
+- `procede-nitido.json`: ticket nítido dentro del período.
+- `revision-fuera-periodo.json`: almuerzo del 25 sep.
+- `revision-duplicado.json`: mismo proveedor, fecha y monto.
+- `revision-confianza-baja.json`: RAW vacío → REVISIÓN, no invento.
+- `no-procede-hospedaje-tope.json`: hospedaje sobre tope.
+- `revision-motivo-ambiguo.json`: «compré unas cosas» → REVISIÓN.
 
 Métricas de producto (dominio, sin GPU):
 

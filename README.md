@@ -8,7 +8,7 @@
 
 No es «una IA que lee facturas». No es «una IA que reemplaza al contador». Si el modelo se vuelve loco, como máximo abre una ⚠: **nunca autoriza un pago**.
 
-Este repositorio ya tiene el **producto no-QVAC**: workspaces, contratos, motor de reglas, centro de excepciones, liquidación, export e inbox DTO. VisionPsy / Qwen / Hyperswarm quedan como **puertos** (`IVisionInference`, `ILanguageModel`, `IQvacProvider`) sin cablear el SDK. Justificación en [`Docs/`](./Docs/README.md).
+Este repositorio ya tiene workspaces, contratos, motor de reglas, centro de excepciones, liquidación, export e inbox DTO. VisionPsy está cableado mediante `QvacVisionPsyAdapter` en la composición Expo; Qwen e Hyperswarm siguen como **puertos** (`ILanguageModel`, `IQvacProvider`). Justificación en [`Docs/`](./Docs/README.md).
 
 ## Instalar el escritorio
 
@@ -77,7 +77,7 @@ npm run desktop:dist:win    # instalador NSIS (mejor en Windows)
 npm run desktop:dist:mac    # .dmg arm64 + x64 (hace falta un Mac)
 ```
 
-Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy no está cableado.
+Móvil: `npm run mobile:start` (Expo). Cámara y DTO manual; VisionPsy usa el adaptador Expo, pero requiere un dispositivo físico con el GGUF configurado: no funciona en Expo Go.
 
 El escritorio siembra el viaje demo Liberia 10–14 sep (6 PROCEDE + 2 REVISIÓN) **solo si SQLite está vacío**. Recargar no borra viajes ni excepciones. Detalle: [`Docs/12-persistencia-sqlite.md`](./Docs/12-persistencia-sqlite.md).
 

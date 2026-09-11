@@ -222,4 +222,36 @@ describe('pipeline de expediente (sin QVAC)', () => {
     const workspace = await seedDemoWorkspace()
     await expect(workspace.closeTrip(DEMO_TRIP.id)).rejects.toThrow(/excepciones abiertas/)
   })
+
+  it('declara un motivo normalizado sin tocar la categoría extraída', () => {
+    const workspace = createWorkspace(createMemoryDeps())
+    const extraction: VisionResult = {
+      proveedor: 'Tienda Ruta 1',
+      fecha: '2026-09-13',
+      monto: 3000,
+      moneda: 'CRC',
+      tipo_documento: 'recibo',
+      confianza_lectura: 'alta',
+      raw_text: 'TIENDA 3000',
+      categoria: 'otro',
+    }
+
+    const declared = workspace.declareMotive({
+      extraction,
+      motivo: '  Compré materiales para la visita  ',
+    })
+
+    expect(declared.motivo).toBe('Compré materiales para la visita')
+    expect(declared.categoria).toBe('otro')
+  })
+
+  it('expone la conciliación de adelanto antes de liquidar el viaje', async () => {
+    const workspace = await seedDemoWorkspace()
+
+    const reconciliation = await workspace.reconcileAdvance(DEMO_TRIP.id)
+
+    expect(reconciliation.backedTotal.amount).toBe(137_400)
+    expect(reconciliation.approvedTotal.amount).toBe(119_700)
+    expect(reconciliation.pendingReviewTotal.amount).toBe(17_700)
+  })
 })

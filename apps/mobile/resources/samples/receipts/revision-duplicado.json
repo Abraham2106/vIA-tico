@@ -1,0 +1,17 @@
+{
+  "id": "revision-duplicado",
+  "expected": {
+    "verdict": "REVISION",
+    "rules": ["DUPLICADO"]
+  },
+  "extraction": {
+    "proveedor": "Soda La Casita",
+    "fecha": "2026-09-12",
+    "monto": 8500,
+    "moneda": "CRC",
+    "tipo_documento": "recibo",
+    "confianza_lectura": "alta",
+    "raw_text": "SODA LA CASITA\n12 SEP 2026\nCOPIA DEL TICKET\nTOTAL CRC 8 500",
+    "categoria": "alimentacion"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "revision-fuera-periodo",
+  "expected": {
+    "verdict": "REVISION",
+    "rules": ["FECHA_FUERA_PERIODO"]
+  },
+  "extraction": {
+    "proveedor": "Restaurante El Farol",
+    "fecha": "2026-09-25",
+    "monto": 9200,
+    "moneda": "CRC",
+    "tipo_documento": "factura",
+    "confianza_lectura": "alta",
+    "raw_text": "RESTAURANTE EL FAROL\n25 SEP 2026\nALMUERZO CRC 9 200",
+    "categoria": "alimentacion"
+  }
+}

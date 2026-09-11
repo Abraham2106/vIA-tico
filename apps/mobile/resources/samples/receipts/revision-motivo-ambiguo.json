@@ -1,0 +1,18 @@
+{
+  "id": "revision-motivo-ambiguo",
+  "expected": {
+    "verdict": "REVISION",
+    "rules": ["MOTIVO_AMBIGUO"]
+  },
+  "extraction": {
+    "proveedor": "Tienda Ruta 1",
+    "fecha": "2026-09-13",
+    "monto": 3000,
+    "moneda": "CRC",
+    "tipo_documento": "recibo",
+    "confianza_lectura": "alta",
+    "raw_text": "TIENDA RUTA 1\n13 SEP 2026\nTOTAL CRC 3 000",
+    "categoria": "otro",
+    "motivo": "compré unas cosas"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "no-procede-hospedaje-tope",
+  "expected": {
+    "verdict": "NO_PROCEDE",
+    "rules": ["TOPE_HOSPEDAJE"]
+  },
+  "extraction": {
+    "proveedor": "Hotel Mirador",
+    "fecha": "2026-09-11",
+    "monto": 120000,
+    "moneda": "CRC",
+    "tipo_documento": "factura",
+    "confianza_lectura": "alta",
+    "raw_text": "HOTEL MIRADOR\n11 SEP 2026\nUNA NOCHE CRC 120 000",
+    "categoria": "hospedaje"
+  }
+}
