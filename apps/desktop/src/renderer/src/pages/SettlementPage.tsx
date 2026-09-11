@@ -18,9 +18,10 @@ type Props = {
   api: DesktopApi
   focusTripId?: string
   onChange: () => Promise<void>
+  onNeedTrip: () => void
 }
 
-export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) {
+export function SettlementPage({ snapshot, api, focusTripId, onChange, onNeedTrip }: Props) {
   const trip = snapshot.trips.find((item) => item.id === focusTripId) ?? snapshot.trips[0]
   const [settlement, setSettlement] = useState<Awaited<ReturnType<DesktopApi['settleTrip']>> | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -34,8 +35,9 @@ export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) 
     return (
       <PageScaffold title="Liquidación">
         <AppEmptyState
-          title="No hay viajes"
-          subtitle="Registra un viaje para liquidar adelanto contra comprobantes."
+          title="No hay un viaje en contexto"
+          subtitle="La liquidación compara el adelanto con los comprobantes de un viaje."
+          action={{ text: 'Ir a Viajes', onClick: onNeedTrip }}
         />
       </PageScaffold>
     )
@@ -56,7 +58,7 @@ export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) 
   return (
     <PageScaffold
       title="Liquidación"
-      subtitle={`${trip.destination} · ${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)}`}
+      subtitle={`Paso 4: ${trip.destination} · ${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)}. Adelanto contra lo aprobado; lo que sigue en revisión no se cierra.`}
       pageActions={[{ kind: 'secondary', label: 'Cerrar viaje', onClick: () => void close() }]}
     >
       {error ? (
@@ -89,8 +91,8 @@ export function SettlementPage({ snapshot, api, focusTripId, onChange }: Props) 
       ) : null}
       {settlement ? (
         <p className="cds--label-01" style={{ marginTop: '1rem' }}>
-          {settlement.procedeCount} PROCEDE · {settlement.revisionCount} REVISIÓN · {settlement.noProcedeCount} NO
-          PROCEDE · {settlement.openExceptionCount} excepciones abiertas
+          {settlement.procedeCount} aprobados · {settlement.revisionCount} por revisar · {settlement.noProcedeCount}{' '}
+          no proceden · {settlement.openExceptionCount} excepciones abiertas
         </p>
       ) : null}
     </PageScaffold>

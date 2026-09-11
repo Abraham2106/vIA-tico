@@ -115,7 +115,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
   }
 
   return (
-    <PageScaffold title="Ajustes" subtitle="Política, emparejamiento DTO, tema Carbon y Qwen Instruct local.">
+    <PageScaffold title="Ajustes" subtitle="Topes de política, código para el celular, tema y el modelo Qwen en este equipo.">
       <Form
         aria-label="Política"
         onSubmit={(event) => {
@@ -152,7 +152,7 @@ export function SettingsPage({ snapshot, api, onChange }: Props) {
       </Form>
 
       <OptionsTile title="Emparejamiento" summary={pairingCode} open>
-        <p className="cds--label-01">El celular envía analysis-job. La clave Hyperswarm queda vacía a propósito.</p>
+        <p className="cds--label-01">El celular envía el gasto ya leído. No usamos la clave P2P de QVAC para el expediente.</p>
         <p className="vz-num" style={{ fontSize: '2rem', margin: '0.5rem 0' }}>
           {pairingCode}
         </p>

@@ -8,6 +8,8 @@ import type { DesktopApi } from '../../../ports/desktop-api.ts'
 type Props = {
   snapshot: WorkspaceSnapshot
   api: DesktopApi
+  tripId?: string
+  onSelectTrip: (tripId: string) => void
 }
 
 function download(filename: string, mime: string, body: string | Uint8Array) {
@@ -21,28 +23,36 @@ function download(filename: string, mime: string, body: string | Uint8Array) {
   URL.revokeObjectURL(url)
 }
 
-export function ExportPage({ snapshot, api }: Props) {
-  const [tripId, setTripId] = useState(snapshot.trips[0]?.id ?? '')
+export function ExportPage({ snapshot, api, tripId, onSelectTrip }: Props) {
+  const selected = tripId ?? snapshot.trips[0]?.id ?? ''
   const [includeRaw, setIncludeRaw] = useState(true)
   const [message, setMessage] = useState<string | null>(null)
 
   async function run(format: ExportFormat) {
-    const artifact = await api.exportReport({ tripId, format, includeRaw })
+    const artifact = await api.exportReport({ tripId: selected, format, includeRaw })
     download(artifact.filename, artifact.mimeType, artifact.body)
     setMessage(`Exportado ${artifact.filename}`)
   }
 
   return (
-    <PageScaffold title="Exportar" subtitle="PDF, CSV, XLSX y JSON locales. Sin ERP ni nube.">
+    <PageScaffold
+      title="Exportar"
+      subtitle="El expediente queda en este equipo: PDF, CSV, Excel o JSON. No hay envío a un ERP ni a la nube."
+    >
       <Stack gap={5} style={{ maxWidth: '32rem' }}>
-        <Select id="export-trip" labelText="Viaje" value={tripId} onChange={(event) => setTripId(event.target.value)}>
+        <Select
+          id="export-trip"
+          labelText="Viaje"
+          value={selected}
+          onChange={(event) => onSelectTrip(event.target.value)}
+        >
           {snapshot.trips.map((trip) => (
             <SelectItem key={trip.id} value={trip.id} text={`${trip.destination} (${trip.startDate})`} />
           ))}
         </Select>
         <Checkbox
           id="include-raw"
-          labelText="Incluir RAW de visión"
+          labelText="Incluir texto original leído del ticket"
           checked={includeRaw}
           onChange={(_, { checked }) => setIncludeRaw(checked)}
         />

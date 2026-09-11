@@ -32,9 +32,10 @@ type Props = {
   api: DesktopApi
   onChange: () => Promise<void>
   focusTripId?: string
+  onNeedTrip: () => void
 }
 
-export function ReceiptsPage({ snapshot, api, onChange, focusTripId }: Props) {
+export function ReceiptsPage({ snapshot, api, onChange, focusTripId, onNeedTrip }: Props) {
   const tripId = focusTripId ?? snapshot.trips[0]?.id
   const trip = snapshot.trips.find((item) => item.id === tripId)
   const receipts = snapshot.receipts.filter((item) => item.tripId === tripId)
@@ -72,22 +73,29 @@ export function ReceiptsPage({ snapshot, api, onChange, focusTripId }: Props) {
   if (!trip) {
     return (
       <PageScaffold title="Comprobantes">
-        <AppEmptyState title="No hay viajes" subtitle="Registra un viaje antes de adjuntar comprobantes." />
+        <AppEmptyState
+          title="No hay un viaje en contexto"
+          subtitle="Registra un viaje. Los gastos viven dentro de ese período."
+          action={{ text: 'Ir a Viajes', onClick: onNeedTrip }}
+        />
       </PageScaffold>
     )
   }
 
   return (
     <PageScaffold
-      title={trip.destination}
-      subtitle={`${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)} · adelanto ${formatMoney(trip.advance)}`}
+      title="Comprobantes"
+      subtitle={`${trip.destination} · ${formatDisplayDate(trip.startDate)} – ${formatDisplayDate(trip.endDate)} · adelanto ${formatMoney(trip.advance)}. Todos los tickets del viaje, no solo los que fallan.`}
       tags={[
-        { label: `${counts.procede} PROCEDE`, type: 'green' },
-        { label: `${counts.revision} revisión`, type: 'warm-gray' },
+        { label: `${counts.procede} aprobados`, type: 'green' },
+        { label: `${counts.revision} por revisar`, type: 'warm-gray' },
       ]}
     >
       {receipts.length === 0 ? (
-        <AppEmptyState title="Sin comprobantes" subtitle="Adjunta un DTO o captura desde el celular." />
+        <AppEmptyState
+          title="Sin comprobantes en este viaje"
+          subtitle="Recíbelos desde el celular (Recibir) o registra uno a mano abajo."
+        />
       ) : (
         <TableContainer>
           <Table size="lg" aria-label="Comprobantes del viaje">
@@ -131,8 +139,11 @@ export function ReceiptsPage({ snapshot, api, onChange, focusTripId }: Props) {
           void attach()
         }}
       >
-        <h3 className="cds--heading-compact-01">Adjuntar comprobante (DTO)</h3>
-        <p className="cds--label-01">VisionPsy no está cableado. El DTO entra igual al motor de reglas.</p>
+        <h3 className="cds--heading-compact-01">Registrar un gasto a mano</h3>
+        <p className="cds--label-01">
+          El camino normal es el celular. Esto simula un ticket ya leído para probar las reglas (fecha fuera
+          del viaje, duplicado, confianza baja).
+        </p>
         <TextInput
           id="proveedor"
           labelText="Proveedor"

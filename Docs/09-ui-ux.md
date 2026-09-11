@@ -38,7 +38,7 @@ Paquete `@viaticocero/ui-tokens`: hex light/dark, spacing 4 px, radius, fechas `
 
 ## Navegación real
 
-**Desktop (sidebar, data-heavy):** Excepciones (default) → Viajes → Comprobantes → Inbox → Liquidación → Exportar → Ajustes.
+**Desktop (sidebar, data-heavy):** Inicio (landing + resumen) → Viajes → Comprobantes → Recibir → Por revisar (cola humana, badge) → Liquidación → Exportar → Ajustes.
 
 **Móvil (stack de captura):** Inicio → Capturar → Revisar gasto → Emparejar. No se añaden tabs Liquidar/Perfil: contradicen ADR 0011.
 

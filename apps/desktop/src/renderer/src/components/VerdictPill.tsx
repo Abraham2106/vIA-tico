@@ -1,6 +1,7 @@
 import { Tag } from '@carbon/react'
 import { labelForVerdict, type Verdict } from '@viaticocero/core'
 import { feedbackForVerdict } from '@viaticocero/ui-tokens'
+import { uiVerdictLabel } from '../lib/verdictLabel'
 
 const TYPE: Record<ReturnType<typeof feedbackForVerdict>, 'green' | 'outline' | 'red'> = {
   success: 'green',
@@ -18,7 +19,7 @@ export function VerdictPill({ verdict }: { verdict: Verdict }) {
       title={labelForVerdict(verdict)}
       className={tone === 'warning' ? 'vz-verdict--revision' : undefined}
     >
-      {labelForVerdict(verdict)}
+      {uiVerdictLabel(verdict)}
     </Tag>
   )
 }

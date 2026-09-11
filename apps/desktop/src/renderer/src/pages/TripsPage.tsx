@@ -25,10 +25,19 @@ type Props = {
   snapshot: WorkspaceSnapshot
   api: DesktopApi
   onChange: () => Promise<void>
-  onOpenTrip: (tripId: string) => void
+  selectedTripId?: string
+  onSelectTrip: (tripId: string) => void
+  onOpenReceipts: (tripId: string) => void
 }
 
-export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
+export function TripsPage({
+  snapshot,
+  api,
+  onChange,
+  selectedTripId,
+  onSelectTrip,
+  onOpenReceipts,
+}: Props) {
   const traveler = snapshot.travelers[0]
   const [destination, setDestination] = useState('Puntarenas')
   const [startDate, setStartDate] = useState('2026-09-15')
@@ -47,13 +56,13 @@ export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
       purpose,
     })) as { id: string }
     await onChange()
-    onOpenTrip(trip.id)
+    onSelectTrip(trip.id)
   }
 
   return (
     <PageScaffold
       title="Viajes"
-      subtitle="El comprobante vive en un viaje. Sin ventana de fechas no hay veredicto útil."
+      subtitle="Paso 1: el viaje es el marco. Fechas, destino y adelanto. Cada comprobante se compara contra este período."
     >
       <TableContainer>
         <Table size="lg" aria-label="Viajes">
@@ -67,21 +76,42 @@ export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {snapshot.trips.map((trip) => (
-              <TableRow key={trip.id} onClick={() => onOpenTrip(trip.id)}>
-                <TableCell>{trip.destination}</TableCell>
-                <TableCell className="vz-num">
-                  {formatDisplayDate(trip.startDate)} – {formatDisplayDate(trip.endDate)}
-                </TableCell>
-                <TableCell className="vz-num">{formatMoney(trip.advance)}</TableCell>
-                <TableCell>
-                  <Tag type={trip.status === 'open' ? 'blue' : 'green'} size="sm">
-                    {trip.status === 'open' ? 'Abierto' : 'Liquidado'}
-                  </Tag>
-                </TableCell>
-                <TableCell>{snapshot.receipts.filter((item) => item.tripId === trip.id).length}</TableCell>
-              </TableRow>
-            ))}
+            {snapshot.trips.map((trip) => {
+              const selected = trip.id === selectedTripId
+              return (
+                <TableRow
+                  key={trip.id}
+                  onClick={() => onSelectTrip(trip.id)}
+                  className={selected ? 'cds--data-table--selected' : undefined}
+                >
+                  <TableCell>{trip.destination}</TableCell>
+                  <TableCell className="vz-num">
+                    {formatDisplayDate(trip.startDate)} – {formatDisplayDate(trip.endDate)}
+                  </TableCell>
+                  <TableCell className="vz-num">{formatMoney(trip.advance)}</TableCell>
+                  <TableCell>
+                    <Tag type={trip.status === 'open' ? 'blue' : 'green'} size="sm">
+                      {trip.status === 'open' ? 'Abierto' : 'Liquidado'}
+                    </Tag>
+                  </TableCell>
+                  <TableCell>
+                    <div className="vz-trip-row-actions">
+                      {snapshot.receipts.filter((item) => item.tripId === trip.id).length}
+                      <Button
+                        kind="ghost"
+                        size="sm"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onOpenReceipts(trip.id)
+                        }}
+                      >
+                        Ver gastos
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -93,7 +123,10 @@ export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
           void createTrip()
         }}
       >
-        <h3 className="cds--heading-compact-01">Registrar viaje</h3>
+        <h3 className="cds--heading-compact-01">Registrar otro viaje</h3>
+        <p className="cds--label-01">
+          El viaje demo (Liberia, 10–14 Sep) ya está cargado. Crea otro si quieres probar un período distinto.
+        </p>
         <TextInput
           id="destino"
           labelText="Destino"
@@ -131,7 +164,7 @@ export function TripsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
         />
         <TextInput
           id="motivo"
-          labelText="Motivo"
+          labelText="Motivo del viaje"
           value={purpose}
           onChange={(event) => setPurpose(event.target.value)}
         />

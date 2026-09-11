@@ -40,9 +40,7 @@ export function PageScaffold({
       <PageHeader.Root>
         <PageHeader.BreadcrumbBar>
           <Breadcrumb noTrailingSlash>
-            <BreadcrumbItem href="#" onClick={(event) => event.preventDefault()}>
-              ViáticoCero
-            </BreadcrumbItem>
+            <BreadcrumbItem href="#inicio">ViáticoCero</BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>{title}</BreadcrumbItem>
           </Breadcrumb>
         </PageHeader.BreadcrumbBar>

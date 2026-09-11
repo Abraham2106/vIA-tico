@@ -11,6 +11,7 @@ Revisar todos los documentos extraídos es el proceso manual que el producto dic
 ## Decisión
 
 - La pantalla primaria de `apps/desktop` es el **centro de excepciones** (filas ⚠ / `REVISIÓN` y `NO PROCEDE`).
+- Enmienda 2026-09-11: la **ruta por defecto** es `Inicio` (resumen + flujo). La cola humana sigue siendo **Por revisar**; no se revisan los `PROCEDE` como trabajo diario.
 - Los `PROCEDE` se consolidan en la liquidación; no son la cola de trabajo.
 - El demo de hackathon (cuña): viaje + comprobante inconsistente → excepción visible, sin explicar arquitectura.
 - El móvil captura, toma motivo libre y muestra preview del DTO; **no** liquida.

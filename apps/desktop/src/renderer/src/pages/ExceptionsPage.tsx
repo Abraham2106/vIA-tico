@@ -36,10 +36,11 @@ type Props = {
   snapshot: WorkspaceSnapshot
   api: DesktopApi
   onChange: () => Promise<void>
-  onOpenTrip: (tripId: string) => void
+  focusTripId?: string
+  onOpenReceipts: (tripId: string) => void
 }
 
-export function ExceptionsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
+export function ExceptionsPage({ snapshot, api, onChange, focusTripId, onOpenReceipts }: Props) {
   const [filter, setFilter] = useState<'open' | 'all'>('open')
   const [selected, setSelected] = useState<string | null>(null)
   const [panelOpen, setPanelOpen] = useState(true)
@@ -48,13 +49,14 @@ export function ExceptionsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
   const rows = useMemo(() => {
     return snapshot.exceptions
       .filter((item) => (filter === 'open' ? item.status === 'open' : true))
+      .filter((item) => (focusTripId ? item.tripId === focusTripId : true))
       .map((item) => {
         const receipt = snapshot.receipts.find((row) => row.id === item.receiptId)
         const trip = snapshot.trips.find((row) => row.id === item.tripId)
         return { item, receipt, trip }
       })
       .filter((row) => row.receipt)
-  }, [filter, snapshot])
+  }, [filter, focusTripId, snapshot])
 
   const current = panelOpen
     ? (rows.find((row) => row.item.id === selected) ?? rows[0] ?? null)
@@ -99,8 +101,8 @@ export function ExceptionsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
 
   return (
     <PageScaffold
-      title="Centro de excepciones"
-      subtitle="Solo lo que el código no puede liquidar. Los PROCEDE no son cola de trabajo."
+      title="Por revisar"
+      subtitle="Paso 3: cola humana. Lo que el código ya liquidó no aparece aquí. Aprobar aquí sí autoriza, el modelo no."
       tags={[
         { label: `${rows.length} en cola`, type: 'blue' },
         { label: `${errorCount} no proceden`, type: errorCount ? 'red' : 'green' },
@@ -118,12 +120,12 @@ export function ExceptionsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
       {rows.length === 0 ? (
         <AppEmptyState
           title="Nada que decidir"
-          subtitle="No hay comprobantes que requieran a una persona. Lo automático está en Liquidación."
+          subtitle="Todo lo de este viaje pasó las reglas, o aún no hay gastos. Lo automático está en Comprobantes y Liquidación."
         />
       ) : (
         <>
           <TableContainer>
-            <Table size="lg" aria-label="Excepciones abiertas">
+            <Table size="lg" aria-label="Gastos por revisar">
               <TableHead>
                 <TableRow>
                   <TableHeader>Proveedor</TableHeader>
@@ -185,7 +187,7 @@ export function ExceptionsPage({ snapshot, api, onChange, onOpenTrip }: Props) {
                 trip={current.trip}
                 note={note}
                 onNote={setNote}
-                onOpenTrip={() => onOpenTrip(current.trip!.id)}
+                onOpenTrip={() => onOpenReceipts(current.trip!.id)}
               />
             </SidePanel>
           ) : null}
@@ -237,7 +239,7 @@ function ExceptionBody({
         rows={3}
       />
       <Button kind="ghost" size="sm" onClick={onOpenTrip}>
-        Ver viaje
+        Ver comprobantes del viaje
       </Button>
     </Stack>
   )
