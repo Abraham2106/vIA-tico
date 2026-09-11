@@ -49,11 +49,15 @@ export default function PreviewScreen() {
       setMessage('Configura inbox URL en Emparejar')
       return
     }
+    if (!pairing.pairingCode.trim()) {
+      setMessage('Configura el código de emparejamiento en Emparejar')
+      return
+    }
     setSending(true)
     try {
       const currentJob = draftToJob()
       setJob(currentJob)
-      await new HttpJobTransport(pairing.inboxUrl).send(currentJob)
+      await new HttpJobTransport(pairing.inboxUrl, pairing.pairingCode).send(currentJob)
       setMessage('Enviado al inbox del escritorio')
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error))
